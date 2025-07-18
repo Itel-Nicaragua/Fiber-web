@@ -1,0 +1,13 @@
+gunicorn
+
+Flask
+Jinja2
+requests
+Werkzeug
+psycopg2-binary
+Flask-Session
+python-dotenv
+imagekitio
+flask-paginate
+urllib3==1.26.*
+docraptor

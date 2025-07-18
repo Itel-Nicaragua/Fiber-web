@@ -1,0 +1,219 @@
+{% extends "layaout2.html" %} {% block main %}
+
+<div class="flex flex-column sm:flex-row flex-wrap space-y-4 sm:space-y-0 items-center justify-between pb-4">
+  <div>
+    <button id="dropdownRadioButton" data-dropdown-toggle="dropdownRadio"
+      class="inline-flex items-center text-gray-500 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-3 py-1.5 light:bg-gray-800 light:text-white light:border-gray-600 light:hover:bg-gray-700 light:hover:border-gray-600 light:focus:ring-gray-700"
+      type="button">
+      <svg class="w-3 h-3 text-gray-500 light:text-gray-400 me-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+        fill="currentColor" viewBox="0 0 20 20">
+        <path
+          d="M10 0a10 10 0 1 0 10 10A10.011 10.011 0 0 0 10 0Zm3.982 13.982a1 1 0 0 1-1.414 0l-3.274-3.274A1.012 1.012 0 0 1 9 10V6a1 1 0 0 1 2 0v3.586l2.982 2.982a1 1 0 0 1 0 1.414Z" />
+      </svg>
+     Filtrar por fecha
+      <svg class="w-2.5 h-2.5 ms-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+        viewBox="0 0 10 6">
+        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4" />
+      </svg>
+    </button>
+    <!-- Dropdown menu -->
+    <div id="dropdownRadio"
+      class="z-10 hidden w-48 bg-white divide-y divide-gray-100 rounded-lg shadow-sm light:bg-gray-700 light:divide-gray-600"
+      data-popper-reference-hidden="" data-popper-escaped="" data-popper-placement="top"
+      style="position: absolute; inset: auto auto 0px 0px; margin: 0px; transform: translate3d(522.5px, 3847.5px, 0px);">
+      <ul class="p-3 space-y-1 text-sm text-gray-700 light:text-gray-200" aria-labelledby="dropdownRadioButton">
+        <li>
+          <div class="flex items-center p-2 rounded-sm hover:bg-gray-100 light:hover:bg-gray-600">
+            <input id="filter-radio-example-1" type="radio" value="1" name="filtro_fecha_radio" data-label="Último día"
+              class="w-4 h-4 text-blue-900 bg-gray-100 border-gray-300 focus:ring-blue-500 light:focus:ring-blue-900 light:ring-offset-gray-800 light:focus:ring-offset-gray-800 focus:ring-2 light:bg-gray-700 light:border-gray-600"
+              {% if filtro_dias == 1 %}checked{% endif %}>
+              <label for="filter-radio-example-1"
+              class="w-full ms-2 text-sm font-medium text-gray-900 rounded-sm light:text-gray-300">Últimos día</label>
+          </div>
+        </li>
+        <li>
+          <div class="flex items-center p-2 rounded-sm hover:bg-gray-100 light:hover:bg-gray-600">
+            <input id="filter-radio-example-2" type="radio" value="7" name="filtro_fecha_radio" data-label="Últimos 7 días"
+              class="w-4 h-4 text-blue-900 bg-gray-100 border-gray-300 focus:ring-blue-500 light:focus:ring-blue-900 light:ring-offset-gray-800 light:focus:ring-offset-gray-800 focus:ring-2 light:bg-gray-700 light:border-gray-600"
+              {% if filtro_dias == 7 %}checked{% endif %}>
+              <label for="filter-radio-example-2"
+              class="w-full ms-2 text-sm font-medium text-gray-900 rounded-sm light:text-gray-300">Últimos 7 días</label>
+          </div>
+        </li>
+        <li>
+          <div class="flex items-center p-2 rounded-sm hover:bg-gray-100 light:hover:bg-gray-600">
+            <input id="filter-radio-example-3" type="radio" value="30" name="filtro_fecha_radio" data-label="Últimos 30 días"
+              class="w-4 h-4 text-blue-900 bg-gray-100 border-gray-300 focus:ring-blue-500 light:focus:ring-blue-900 light:ring-offset-gray-800 light:focus:ring-offset-gray-800 focus:ring-2 light:bg-gray-700 light:border-gray-600"
+              {% if filtro_dias == 30 %}checked{% endif %}>
+              <label for="filter-radio-example-3"
+              class="w-full ms-2 text-sm font-medium text-gray-900 rounded-sm light:text-gray-300">Últimos 30 días</label>
+          </div>
+        </li>
+        <li>
+          <div class="flex items-center p-2 rounded-sm hover:bg-gray-100 light:hover:bg-gray-600">
+            <input id="filter-radio-example-4" type="radio" value="60" name="filtro_fecha_radio" data-label="Últimos 2 meses"
+              class="w-4 h-4 text-blue-900 bg-gray-100 border-gray-300 focus:ring-blue-500 light:focus:ring-blue-900 light:ring-offset-gray-800 light:focus:ring-offset-gray-800 focus:ring-2 light:bg-gray-700 light:border-gray-600"
+              {% if filtro_dias == 60 %}checked{% endif %}>
+              <label for="filter-radio-example-4"
+              class="w-full ms-2 text-sm font-medium text-gray-900 rounded-sm light:text-gray-300">Últimos 2 meses</label>
+          </div>
+        </li>
+        <li>
+          <div class="flex items-center p-2 rounded-sm hover:bg-gray-100 light:hover:bg-gray-600">
+            <input id="filter-radio-example-5" type="radio" value="365" name="filtro_fecha_radio" data-label="Último año"
+              class="w-4 h-4 text-blue-900 bg-gray-100 border-gray-300 focus:ring-blue-500 light:focus:ring-blue-900 light:ring-offset-gray-800 light:focus:ring-offset-gray-800 focus:ring-2 light:bg-gray-700 light:border-gray-600"
+              {% if filtro_dias == 365 %}checked{% endif %}>
+              <label for="filter-radio-example-5"
+              class="w-full ms-2 text-sm font-medium text-gray-900 rounded-sm light:text-gray-300">Último año</label>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <form method="GET" action="{{ url_for('index') }}" class="flex items-center gap-2">
+    <div class="relative">
+      <input type="text" name="search" placeholder="Buscar"
+        class="pl-10 pr-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-900"
+        value="{{ search_term if search_term }}" />
+      <div class="absolute inset-y-0 left-0 flex items-center pl-2 pointer-events-none">
+        <i class="fa fa-search text-gray-400"></i>
+      </div>
+    </div>
+    {% if search_term %}
+    <a href="{{ url_for('index') }}" class="btn btn-outline-secondary"><i class="fa fa-trash"></i></a>
+    {% endif %}
+    <input type="hidden" id="filtro_fecha_hidden" value="{{ request.args.get('filtro_fecha', '') }}">
+  </form>
+</div>
+
+<table class="w-full text-sm text-left rtl:text-right text-gray-500 light:text-gray-400">
+  <thead class="text-xs text-gray-700 uppercase bg-gray-50 light:bg-gray-700 light:text-gray-400 text-center">
+    <tr>
+      <th class="px-4 py-2">
+        Numero de servicio
+      </th>
+      <th class="px-4 py-2">
+        Estado de puerto
+      </th>
+      <th class="px-4 py-2 break-words max-w-[280px] capitalize">
+        Nombre
+      </th>
+      <th class="px-4 py-2">
+        Fecha de suscripcion
+      </th>
+      <th class="px-4 py-2">
+        Departameto
+      </th>
+      <th class="px-4 py-2">
+        Deuda ICRM
+      </th>
+      <th class="px-4 py-2">
+        Proximo pago
+      </th>
+      <th class="px-4 py-2">
+        Accion
+      </th>
+      <th class="px-4 py-2">
+        Estado final
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for item in datos %}
+    <tr
+      class="bg-white border-b light:bg-gray-800 light:border-gray-700 border-gray-200 hover:bg-gray-50 light:hover:bg-gray-600 text-center">
+      <th scope="row" class="px-4 py-2 font-medium text-gray-900 whitespace-nowrap light:text-white">
+        {{ item.numero }}
+      </th>
+      <td class="px-4 py-2">
+        {{ item.estatus_orion }}
+      </td>
+      <td class="px-4 py-2">
+        {{ item.Realname }}
+      </td>
+      <td class="px-4 py-2">
+        {{ item.fecha_suscripcion }}
+      </td>
+      <td class="px-4 py-2">
+        {{ item.departamento }}
+      </td>
+      <td class="px-4 py-2">
+        {{ item.deuda_icrm }}
+      </td>
+      <td class="px-4 py-2">
+        {{ item.Proximo_Pago }}
+      </td>
+      <td class="px-4 py-2">
+        <div class="flex flex-col items-center">
+          <span
+            class="inline-block w-1.5 h-1.5 rounded-full mb-1 {% if item.Accion == 'Cobranza' %}bg-red-500{% else %}bg-green-500{% endif %}"></span>
+          <span>{{ item.Accion }}</span>
+        </div>
+      </td>
+      <td class="px-4 py-2">
+        {{ item.estado_final }}
+      </td>
+    </tr>
+    {% else %}
+    <tr>
+      <td colspan="9" class="py-4 text-center text-gray-400">
+        No se encontraron registros.
+      </td>
+    </tr>
+    {% endfor %}
+
+  </tbody>
+</table>
+
+
+<!-- Resumen de resultados -->
+<div class="text-sm text-gray-600 text-center mt-2">
+  Mostrando {{ mostrando_inicio }}–{{ mostrando_fin }} de {{ total }}
+  resultados
+</div>
+
+<!-- Paginación -->
+<div class="flex justify-center mt-2">
+  <nav class="inline-flex space-x-1" aria-label="Pagination">
+    {% if pagina > 1 %}
+    <a href="{{ url_for('index', page=pagina-1, search=search_term, filtro_fecha=filtro_dias) }}"
+      class="px-3 py-2 border border-gray-300 text-sm text-gray-700 bg-white hover:bg-blue-100 rounded">
+      ← Anterior
+    </a>
+    {% endif %} 
+    
+    {% if start_page > 1 %}
+    <a href="{{ url_for('index', page=1, search=search_term, filtro_fecha=filtro_dias) }}"
+      class="px-3 py-2 border border-gray-300 text-sm text-gray-700 bg-white hover:bg-blue-100 rounded">1</a>
+    {% if start_page > 2 %}
+    <span class="px-2 py-2 text-gray-500">...</span>
+    {% endif %} 
+    {% endif %} 
+    
+    {% for p in range(start_page, end_page + 1) %}
+    <a href="{{ url_for('index', page=p, search=search_term, filtro_fecha=filtro_dias) }}"
+      class="px-3 py-2 border border-gray-300 text-sm font-medium {{ 'bg-blue-900 text-white' if p == pagina else 'bg-white text-gray-700 hover:bg-blue-100' }} rounded">
+      {{ p }}
+    </a>
+    {% endfor %} 
+    
+    {% if end_page < paginas %} 
+      {% if end_page < paginas - 1 %} 
+      <span class="px-2 py-2 text-gray-500">...</span>
+      {% endif %}
+      <a href="{{ url_for('index', page=paginas, search=search_term, filtro_fecha=filtro_dias) }}"
+        class="px-3 py-2 border border-gray-300 text-sm text-gray-700 bg-white hover:bg-blue-100 rounded">{{ paginas }}</a>
+    {% endif %} 
+    
+    {% if pagina < paginas %} 
+    <a href="{{ url_for('index', page=pagina+1, search=search_term, filtro_fecha=filtro_dias) }}"
+      class="px-3 py-2 border border-gray-300 text-sm text-gray-700 bg-white hover:bg-blue-100 rounded">
+      Siguiente →
+    </a>
+    {% endif %}
+  </nav>
+</div>
+
+
+{% endblock %}
+</div>

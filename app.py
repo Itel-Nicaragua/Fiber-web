@@ -7,8 +7,9 @@ from flask_session import Session
 from flask import Flask, flash, redirect, render_template, request, session
 from tempfile import mkdtemp
 from werkzeug.security import check_password_hash, generate_password_hash
-from helpers import admin_required, login_required, exportar_historial, exportar_historial_telemarketing, exportar_base_total
+from helpers import admin_required, login_required, exportar_historial, exportar_historial_telemarketing, exportar_base_total, formatear_fecha
 from flask import jsonify, send_file
+import pyodbc
 import tempfile
 from conexion import get_sqlserver_connection1
 from math import ceil
@@ -18,6 +19,8 @@ from datetime import datetime, timedelta
 
 app = Flask(__name__)
 
+app.jinja_env.filters["date"] = formatear_fecha
+
 # Configure session to use filesystem
 app.config["SESSION_FILE_DIR"] = mkdtemp()
 app.config["SESSION_PERMANENT"] = False
@@ -25,6 +28,7 @@ app.config["SESSION_TYPE"] = "filesystem"
 app.config['SECRET_KEY'] = 'super secret key'
 
 Session(app)
+
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -211,18 +215,126 @@ def logout():
 
 @app.route("/exito")
 def exito():
-    flash("Archivo exportado correctamente", "exito")
-    return redirect("/")
+    motivos_estado = [
+    "Baja Administrativa Sin Penalización",
+    "Baja Voluntaria",
+    "Cobranza Activa",
+    "Falta de información PBDC",
+    "Reporte al Buro",
+    "Saneado Interno"
+    ]
+    return render_template("descargar.html", motivos_estado=motivos_estado)
 
-@app.route("/prueba")
-def prueba():
+
+@app.route("/info_cliente/<numero>/", methods=["GET", "POST"])
+@login_required
+def info_cliente(numero):
+    if request.method == "GET":
+        conn = get_sqlserver_connection1()
+        cursor = conn.cursor()
+        cursor.execute(f"SELECT * FROM actual WHERE numero = {numero}")
+        datos = cursor.fetchone()
+        
+        cursor.execute(f"SELECT * FROM historial_llamadas WHERE numero = {numero} ORDER BY fecha_registro DESC")
+        llamadas = cursor.fetchall()
+        cursor.close()
+        conn.close()
+
+        motivos_estado = [
+            "Baja Administrativa Sin Penalización",
+            "Baja Voluntaria",
+            "Cobranza Activa",
+            "Falta de información PBDC",
+            "Reporte al Buro",
+            "Saneado Interno"
+        ]
+
+        return render_template("info_cliente.html", datos=datos, llamadas = llamadas, motivos_estado=motivos_estado)
+    
+    else:
+        estado = request.form.get('estado')
+        comentario = request.form.get('comentarios')
+
+        if not estado:
+            flash("Debe seleccionar un estado", "error")
+            return redirect(request.url)  
+        if not comentario:
+            flash("Debe escribir un comentario", "error")
+            return redirect(request.url)  
+        
+        # Aquí haces lo que necesites con los datos: guardarlos, imprimirlos, etc.
+        print(f"Estado: {estado}, Comentario: {comentario}")
+        flash("Estado reportado satisfactoriamente", "exito")
+        return redirect(request.url) 
+
+
+
+@app.route('/insertar_llamada', methods=['POST'])
+@login_required
+def insertar_llamada():
+    numero  = request.args.get('numero')
+    gestion_cobro = request.form.get('gestion_cobro')
+    herramienta_cobro = request.form.get('herramienta_cobro')
+    motivo_macro = request.form.get('motivo_macro')
+    motivo_micro = request.form.get('motivo_micro')
+    proxima_llamada_raw = request.form.get('proxima_llamada')
+    estado_llamada = request.form.get('estado_llamada')
+    comentario = request.form.get('comentarios')
+    usuario = 'EnriqueM'
+    rol = 0
+
+    # Validar formato de fecha
+    try:
+        fecha_llamada = datetime.fromisoformat(proxima_llamada_raw).strftime('%Y-%m-%d %H:%M:%S')
+    except ValueError:
+        flash("Fecha inválida. Intenta de nuevo.", "error")
+        return redirect(f"/info_cliente/{numero}")
+
+    # Área según rol
+    area_map = {0: 'CyC', 1: 'SAD', 2: 'Tiendas', 3: 'Telemarketing'}
+    area = area_map.get(rol, 'Desconocido')
+
     conn = get_sqlserver_connection1()
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM actual WHERE numero = 29279197")
-    datos = cursor.fetchone()
-    
-    cursor.execute("SELECT * FROM historial_llamadas WHERE numero = 29279197 ORDER BY fecha_registro DESC")
-    llamadas = cursor.fetchall()
-    cursor.close()
-    conn.close()
-    return render_template("prueba.html", datos=datos, llamadas = llamadas)
+    cursor.execute("""
+        INSERT INTO historial_llamadas (
+            numero, numero_referido, canal_ventas, nombre_canal_ventas, FUR,
+            suma_recargas, recarga_ajuste, NoReclamos, fecha_suscripcion,
+            information_confirmation, Mes, AnchoBanda, precio, paquete, direccion,
+            ciclo, Codigo_OA, departamento, antiguedad_meses, estatus_contrato,
+            recarga_mes_anterior, recarga_mes_actual, deuda_icrm, estatus_orion,
+            Proximo_Pago, ContactphoneNo, Realname, vigencia, distancia,
+            fecha_renovacion, subsidio, Accion, estado_final, fecha_llamada,
+            estado_llamada, Comentarios, usuario, fecha_registro, area,
+            gestion_cobro, herramienta_cobro, motivo_macro, motivo_micro
+        )
+        SELECT
+            numero, numero_referido, canal_ventas, nombre_canal_ventas, FUR,
+            suma_recargas, recarga_ajuste, NoReclamos, fecha_suscripcion,
+            information_confirmation, Mes, AnchoBanda, precio, paquete, direccion,
+            ciclo, Codigo_OA, departamento, antiguedad_meses, estatus_contrato,
+            recarga_mes_anterior, recarga_mes_actual, deuda_icrm, estatus_orion,
+            Proximo_Pago, ContactphoneNo, Realname, vigencia, distancia,
+            fecha_renovacion, subsidio, Accion, estado_final,
+            ?, ?, ?, ?, GETDATE(), ?, ?, ?, ?, ?
+        FROM actual
+        WHERE numero = ?
+    """, (
+        fecha_llamada,
+        estado_llamada,
+        comentario,
+        usuario,
+        area,
+        gestion_cobro,
+        herramienta_cobro,
+        motivo_macro,
+        motivo_micro,
+        numero
+    ))
+
+    conn.commit()
+    flash("Llamada registrada correctamente", "exito")
+    return redirect(f"/info_cliente/{numero}")
+
+
+

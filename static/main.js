@@ -118,3 +118,22 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 
+document.addEventListener('DOMContentLoaded', function () {
+  const nextBtn = document.querySelector('[data-modal-target="second-modal"]');
+  const selectedSpan = document.getElementById('selected-option');
+
+  nextBtn.addEventListener('click', function () {
+    const selectedRadio = document.querySelector('input[name="estado"]:checked');
+    if (selectedRadio) {
+      selectedSpan.textContent = selectedRadio.value;
+    } else {
+      selectedSpan.textContent = 'Ninguna opción seleccionada';
+    }
+  });
+});
+
+document.querySelectorAll('input[name="estado"]').forEach((radio) => {
+  radio.addEventListener('change', function () {
+    document.getElementById('selected-option').textContent = this.value;
+  });
+});

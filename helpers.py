@@ -3,19 +3,12 @@ import os
 from flask import redirect, request, session
 from functools import wraps
 from flask.helpers import flash
-from base64 import b64encode
-from imagekitio import ImageKit
-from imagekitio.models.UploadFileRequestOptions import UploadFileRequestOptions
-import docraptor
 from conexion import get_sqlserver_connection1
 import pandas as pd
+from datetime import datetime
+import locale
 
-ik = ImageKit(private_key='private_pbBN7H3s6r1YGqTsxPQqdelGb38=',
-                public_key='public_rKkJyqI11fEPBRHq/2QD3PyJJwo=',
-                url_endpoint='https://ik.imagekit.io/JefferssonVMT')
 
-doc_api = docraptor.DocApi()
-doc_api.api_client.configuration.username = '23md2lJdruKB9SQuJ2Pj'
 
 def login_required(f):
     """
@@ -92,3 +85,19 @@ def exportar_base_total(fecha_inicio, fecha_final):
     df = pd.read_sql(query, conn, params=[fecha_inicio, fecha_final])
     conn.close()
     return df
+
+def formatear_fecha(fecha):
+    try:
+        # Configurar el locale en español (puede variar según el sistema)
+        locale.setlocale(locale.LC_TIME, 'es_ES.UTF-8')
+    except locale.Error:
+        try:
+            # Alternativa para algunos sistemas
+            locale.setlocale(locale.LC_TIME, 'es_ES')
+        except:
+            print("No se pudo configurar el locale en español, se usarán nombres en inglés.")
+    
+    # Formatear la fecha al formato deseado
+    fecha_formateada = fecha.strftime("%d de %B %Y, %H:%M")
+    
+    return fecha_formateada

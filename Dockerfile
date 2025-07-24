@@ -16,12 +16,19 @@ RUN apt-get update && apt-get install -y \
 COPY instantclient-basiclite-linux.x64-19.28.0.0.0dbru.zip /tmp/
 COPY instantclient-sdk-linux.x64-19.28.0.0.0dbru.zip /tmp/
 
-# Descomprimir Oracle Instant Client (asegurando que exista el directorio)
-RUN mkdir -p /usr/lib/oracle/instantclient && \
-    unzip /tmp/instantclient-basiclite-linux.x64-19.28.0.0.0dbru.zip -d /usr/lib/oracle/instantclient && \
-    unzip /tmp/instantclient-sdk-linux.x64-19.28.0.0.0dbru.zip -d /usr/lib/oracle/instantclient && \
-    rm /tmp/instantclient-basiclite-linux.x64-19.28.0.0.0dbru.zip /tmp/instantclient-sdk-linux.x64-19.28.0.0.0dbru.zip
-    
+# Crear carpeta destino
+RUN mkdir -p /usr/lib/oracle/instantclient
+
+# Verifica que el archivo existe
+RUN ls -lh /tmp/instantclient-basiclite-linux.x64-19.28.0.0.0dbru.zip
+
+# Descomprime ambos ZIPs
+RUN unzip /tmp/instantclient-basiclite-linux.x64-19.28.0.0.0dbru.zip -d /usr/lib/oracle/instantclient
+RUN unzip /tmp/instantclient-sdk-linux.x64-19.28.0.0.0dbru.zip -d /usr/lib/oracle/instantclient
+
+# Elimina los ZIPs después de la instalación
+RUN rm /tmp/instantclient-basiclite-linux.x64-19.28.0.0.0dbru.zip /tmp/instantclient-sdk-linux.x64-19.28.0.0.0dbru.zip
+
 # Establecer variables de entorno para Oracle Instant Client (ajustar según nombre de carpeta)
 ENV LD_LIBRARY_PATH=/usr/lib/oracle/instantclient/instantclient_19_28:$LD_LIBRARY_PATH
 ENV ORACLE_HOME=/usr/lib/oracle/instantclient/instantclient_19_28

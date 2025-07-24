@@ -12,14 +12,13 @@ RUN apt-get update && apt-get install -y \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Copiar Oracle Instant Client ZIPs (deben estar en la carpeta donde haces el build)
 COPY instantclient-basiclite-linux.x64-19.28.0.0.0dbru.zip /tmp/
 COPY instantclient-sdk-linux.x64-19.28.0.0.0dbru.zip /tmp/
 
-# Descomprimir Oracle Instant Client
-RUN unzip /tmp/instantclient-basiclite-linux.x64-19.8.0.0.0dbru.zip -d /usr/lib/oracle/instantclient \
- && unzip /tmp/instantclient-sdk-linux.x64-19.8.0.0.0dbru.zip -d /usr/lib/oracle/instantclient \
- && rm /tmp/instantclient-basiclite-linux.x64-19.8.0.0.0dbru.zip /tmp/instantclient-sdk-linux.x64-19.8.0.0.0dbru.zip
+RUN unzip /tmp/instantclient-basiclite-linux.x64-19.28.0.0.0dbru.zip -d /usr/lib/oracle/instantclient \
+    && unzip /tmp/instantclient-sdk-linux.x64-19.28.0.0.0dbru.zip -d /usr/lib/oracle/instantclient \
+    && rm /tmp/instantclient-basiclite-linux.x64-19.28.0.0.0dbru.zip /tmp/instantclient-sdk-linux.x64-19.28.0.0.0dbru.zip
+    
 
 # Configurar variables de entorno para Oracle Instant Client
 ENV LD_LIBRARY_PATH=/usr/lib/oracle/instantclient/instantclient_19_8:$LD_LIBRARY_PATH

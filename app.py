@@ -2,7 +2,7 @@ from datetime import date, datetime
 import os
 import requests
 from dotenv import load_dotenv
-from flask import Flask, json, session, url_for
+from flask import Flask, json, session, url_for, make_response, render_template_string
 from flask_session import Session
 from flask import Flask, flash, redirect, render_template, request, session
 from tempfile import mkdtemp
@@ -14,7 +14,7 @@ import tempfile
 from conexion import get_sqlserver_connection1
 from math import ceil
 import math
-import time
+import pdfkit
 from datetime import datetime, timedelta
 import logging
 
@@ -29,7 +29,6 @@ app.config["SESSION_TYPE"] = "filesystem"
 app.config['SECRET_KEY'] = 'super secret key'
 
 Session(app)
-
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -263,7 +262,9 @@ def info_cliente(numero):
         "Saneado Interno"
     ]
 
-    return render_template("info_cliente.html", datos=datos, llamadas = llamadas, motivos_estado=motivos_estado)
+    estado_cuenta = get_estado_cuenta(numero)
+
+    return render_template("info_cliente.html", datos=datos, llamadas = llamadas, motivos_estado=motivos_estado, estado_cuenta=estado_cuenta)
     
     
 
@@ -300,6 +301,7 @@ def reportar_estado():
 def insertar_llamada():
     numero  = request.args.get('numero')
     gestion_cobro = request.form.get('gestion_cobro')
+    herramienta_cobro = request.form.get('herramienta_cobro')
     motivo_macro = request.form.get('motivo_macro')
     motivo_micro = request.form.get('motivo_micro')
     proxima_llamada = request.form.get('proxima_llamada')
@@ -324,7 +326,7 @@ def insertar_llamada():
             Proximo_Pago, ContactphoneNo, Realname, vigencia, distancia,
             fecha_renovacion, subsidio, Accion, estado_final, fecha_llamada,
             estado_llamada, Comentarios, usuario, fecha_registro, area,
-            gestion_cobro, motivo_macro, motivo_micro
+            gestion_cobro, herramienta_cobro, motivo_macro, motivo_micro
         )
         SELECT
             numero, numero_referido, canal_ventas, nombre_canal_ventas, FUR,
@@ -334,7 +336,7 @@ def insertar_llamada():
             recarga_mes_anterior, recarga_mes_actual, deuda_icrm, estatus_orion,
             Proximo_Pago, ContactphoneNo, Realname, vigencia, distancia,
             fecha_renovacion, subsidio, Accion, estado_final,
-            ?, ?, ?, ?, GETDATE(), ?, ?, ?, ?
+            ?, ?, ?, ?, GETDATE(), ?, ?, ?, ?, ?
         FROM actual
         WHERE numero = ?
     """, (
@@ -344,6 +346,7 @@ def insertar_llamada():
         usuario,
         area,
         gestion_cobro,
+        herramienta_cobro,
         motivo_macro,
         motivo_micro,
         numero
@@ -357,4 +360,74 @@ def insertar_llamada():
     return redirect(f"/info_cliente/{numero}")
 
 
+def get_estado_cuenta(numero):
+    conn = get_sqlserver_connection1()
+    cursor = conn.cursor()
 
+    consulta = """
+    WITH DatosRecarga AS (
+        SELECT 
+            MONTH(rechargedate)        AS mes_num,
+            FORMAT(rechargedate,'MMMM','es-es') AS mes_nombre,
+            YEAR(rechargedate)         AS anio,
+            phoneno,
+            SUM(amount)                AS monto_total,
+            COUNT(*)                   AS conteo_recargas,
+            ROW_NUMBER() OVER(
+              ORDER BY YEAR(rechargedate), MONTH(rechargedate)
+            )                          AS cuota
+        FROM cootelcuboparque.cootelcuboparque.cr_history
+        WHERE PhoneNo = ?
+        GROUP BY 
+          MONTH(rechargedate),
+          YEAR(rechargedate),
+          FORMAT(rechargedate,'MMMM','es-es'),
+          phoneno
+    )
+    SELECT
+        d.cuota      AS cuota,
+        LEFT(d.mes_nombre,3) + ' ' + CAST(d.anio AS VARCHAR) AS mes,
+        ROUND(d.monto_total,2) AS monto,
+        ROUND(
+          ((0.36*a.distancia)+60.30)/a.vigencia *
+           CASE WHEN d.monto_total > a.precio 
+                THEN d.monto_total/a.precio 
+                ELSE 1 END
+        ,2)                   AS equipos,
+        ROUND(
+          d.monto_total - 
+          ((0.36*a.distancia)+60.30)/a.vigencia *
+           CASE WHEN d.monto_total > a.precio 
+                THEN d.monto_total/a.precio 
+                ELSE 1 END
+        ,2)                   AS servicio
+    FROM actual a
+    JOIN DatosRecarga d ON a.numero = d.phoneno
+    ORDER BY d.cuota;
+    """
+
+    cursor.execute(consulta, numero)
+    filas = cursor.fetchall()
+
+    # Cálculos
+    total_pagado  = sum(f.monto    for f in filas)
+    total_deuda   = (sum(f.servicio for f in filas) + sum(f.equipos for f in filas)) - total_pagado
+
+    # Contexto para Jinja
+    contexto = {           # o dinámico
+        "fecha":         datetime.now().strftime("%m/%d/%Y %I:%M %p"),
+        "total_pagado":  f"{total_pagado:.2f}",
+        "total_deuda":   f"{total_deuda:.2f}",
+        "detalle": [
+            {
+              "cuota":    f.cuota,
+              "mes":      f.mes,
+              "monto":    f"{f.monto:.2f}",
+              "equipos":  f"{f.equipos:.2f}",
+              "servicio": f"{f.servicio:.2f}"
+            }
+            for f in filas
+        ]
+    }
+
+    return contexto

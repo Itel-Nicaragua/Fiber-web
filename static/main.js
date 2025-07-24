@@ -75,11 +75,6 @@ setTimeout(() => {
 }, 500);
 
 
-function descargar() {
-  setTimeout(() => {
-    window.location.href = "/exito"; // redirige luego de X tiempo
-  }, 2000); // espera 2 segundos para que inicie la descarga
-}
 
 // Info cliente
 document.addEventListener("DOMContentLoaded", function () {

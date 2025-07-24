@@ -16,6 +16,7 @@ from math import ceil
 import math
 import time
 from datetime import datetime, timedelta
+import logging
 
 app = Flask(__name__)
 
@@ -73,7 +74,7 @@ def login():
 
         except Exception as e:
             flash("Error de conexión con la base de datos", "error")
-            print(e)
+            logging.error(f"Error en login: {e}", exc_info=True)
             return render_template("login.html")
 
     else:
@@ -167,7 +168,7 @@ def index():
 
         except Exception as e:
             flash("Error de conexión con la base de datos", "error")
-            print(e)
+            logging.error(f"Error en index: {e}", exc_info=True)
             return render_template("index.html")
     else:
         tipo = request.form.get("tipo-export")
@@ -287,7 +288,6 @@ def reportar_estado():
     cursor.close()
     conn.close()
 
-    print(f"Estado: {estado}, Comentario: {comentario}")
     flash("Estado reportado satisfactoriamente", "exito")
     return redirect(f"/info_cliente/{numero}")
 

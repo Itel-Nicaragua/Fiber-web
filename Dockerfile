@@ -23,16 +23,13 @@ RUN curl -sSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor 
 RUN apt-get update && ACCEPT_EULA=Y apt-get install -y msodbcsql17 && \
     rm -rf /var/lib/apt/lists/*
 
-# Instalar Oracle Instant Client
-RUN mkdir -p /usr/lib/oracle/
-COPY instantclient-basiclite-linux.x64-19.28.0.0.0dbru.zip /tmp/
-COPY instantclient-sdk-linux.x64-19.28.0.0.0dbru.zip /tmp/
-RUN unzip /tmp/instantclient-basiclite-linux.x64-19.28.0.0.0dbru.zip -d /usr/lib/oracle/ && \
-    unzip /tmp/instantclient-sdk-linux.x64-19.28.0.0.0dbru.zip -d /usr/lib/oracle/ && \
-    rm /tmp/instantclient-basiclite-linux.x64-19.28.0.0.0dbru.zip /tmp/instantclient-sdk-linux.x64-19.28.0.0.0dbru.zip
+# Copiar la carpeta ya descomprimida de Instant Client
+COPY instantclient_19_28 /usr/lib/oracle/instantclient/instantclient_19_28
 
-ENV LD_LIBRARY_PATH=/usr/lib/oracle/instantclient_19_28:$LD_LIBRARY_PATH
-ENV ORACLE_HOME=/usr/lib/oracle/instantclient_19_28
+# Configurar variables de entorno para Oracle Instant Client
+ENV LD_LIBRARY_PATH=/usr/lib/oracle/instantclient/instantclient_19_28:$LD_LIBRARY_PATH
+ENV ORACLE_HOME=/usr/lib/oracle/instantclient/instantclient_19_28
+
 
 # Instalar dependencias de Python
 COPY requirements.txt ./

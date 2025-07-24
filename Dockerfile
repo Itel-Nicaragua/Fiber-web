@@ -12,26 +12,28 @@ RUN apt-get update && apt-get install -y \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
+# Copiar los archivos del Instant Client (versión 19.28)
 COPY instantclient-basiclite-linux.x64-19.28.0.0.0dbru.zip /tmp/
 COPY instantclient-sdk-linux.x64-19.28.0.0.0dbru.zip /tmp/
 
+# Descomprimir y eliminar los zip
 RUN unzip /tmp/instantclient-basiclite-linux.x64-19.28.0.0.0dbru.zip -d /usr/lib/oracle/instantclient \
     && unzip /tmp/instantclient-sdk-linux.x64-19.28.0.0.0dbru.zip -d /usr/lib/oracle/instantclient \
     && rm /tmp/instantclient-basiclite-linux.x64-19.28.0.0.0dbru.zip /tmp/instantclient-sdk-linux.x64-19.28.0.0.0dbru.zip
-    
 
-# Configurar variables de entorno para Oracle Instant Client
-ENV LD_LIBRARY_PATH=/usr/lib/oracle/instantclient/instantclient_19_8:$LD_LIBRARY_PATH
-ENV ORACLE_HOME=/usr/lib/oracle/instantclient/instantclient_19_8
+# Establecer variables de entorno para Oracle Instant Client (ajustar según nombre de carpeta)
+ENV LD_LIBRARY_PATH=/usr/lib/oracle/instantclient/instantclient_19_28:$LD_LIBRARY_PATH
+ENV ORACLE_HOME=/usr/lib/oracle/instantclient/instantclient_19_28
 
-# Copiar requirements y proyecto
+# Copiar requirements.txt e instalar dependencias Python
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Copiar todo el proyecto
 COPY . .
 
-# Exponer puerto Flask
+# Exponer el puerto para Flask
 EXPOSE 5000
 
-# Comando para arrancar Flask
+# Comando para iniciar la aplicación Flask
 CMD ["flask", "run", "--host=0.0.0.0", "--port=5000"]

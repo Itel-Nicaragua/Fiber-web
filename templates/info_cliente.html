@@ -15,9 +15,9 @@
                         <p><span class="font-bold">Nombre:</span> {{datos.Realname}}</p>
                         <p><span class="font-bold">Cédula:</span> {{datos.cedula}}</p>
                         <p><span class="font-bold">Teléfono:</span> {{datos.ContactphoneNo}}</p>
-                        <p><span class="font-bold">Dirección:</span> {{datos.direccion }}</p>
                         <p><span class="font-bold">Departamento:</span> {{datos.departamento}}</p>
-                        <p><span class="font-bold">Distrito:</span> Centro</p>
+                        <p class="col-span-semi-full"><span class="font-bold">Dirección:</span> {{datos.direccion }}</p>
+
                     </div>
                 </section>
 
@@ -93,7 +93,7 @@
                             el:
                             {{llamada.fecha_registro | date}}</time>
                         <time class="block mb-2 text-sm font-normal leading-none text-gray-400">Fecha
-                            programada para la proxima llamada: {{llamada.fecha_llamada | date}}
+                            programada para la proxima llamada: {{llamada.fecha_llamada}}
                         </time>
                         <h4 class="flex items-center mb-1 font-semibold text-gray-900">Comentario:</h4>
                         <p class="mb-4 text-base font-normal text-gray-500">{{llamada.Comentarios}}
@@ -172,6 +172,30 @@
 
 <div data-dial-init class="fixed end-6 bottom-6 group">
     <div id="speed-dial-menu-default" class="flex-col items-center hidden mb-4 space-y-2">
+        <button type="button" data-tooltip-target="tooltip-transferir" data-tooltip-placement="left"
+            data-modal-target="select-modal" data-modal-toggle="select-modal"
+            class="flex justify-center items-center w-[52px] h-[52px] text-blue-800 hover:text-blue-900 bg-white rounded-full border border-gray-200 shadow-xs hover:bg-gray-50 focus:ring-4 focus:ring-blue-500 focus:outline-none">
+            <i class="fa-solid fa-up-right-and-down-left-from-center"></i>
+            <span class="sr-only">Transferir</span>
+        </button>
+        <div id="tooltip-transferir" role="tooltip"
+            class="absolute z-10 invisible inline-block w-auto px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-xs opacity-0 tooltip">
+            Transferir
+            <div class="tooltip-arrow" data-popper-arrow></div>
+        </div>
+
+        <button type="button" data-tooltip-target="tooltip-statement" data-tooltip-placement="left"
+            data-modal-target="select-modal" data-modal-toggle="select-modal"
+            class="flex justify-center items-center w-[52px] h-[52px] text-blue-800 hover:text-blue-900 bg-white rounded-full border border-gray-200 shadow-xs hover:bg-gray-50 focus:ring-4 focus:ring-blue-500 focus:outline-none">
+            <i class="fa-solid fa-file-invoice-dollar"></i>
+            <span class="sr-only">Estado de cuenta</span>
+        </button>
+        <div id="tooltip-statement" role="tooltip"
+            class="absolute z-10 invisible inline-block w-auto px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-xs opacity-0 tooltip">
+            Estado de cuenta
+            <div class="tooltip-arrow" data-popper-arrow></div>
+        </div>
+
         <button type="button" data-tooltip-target="tooltip-reportarEstado" data-tooltip-placement="left"
             data-modal-target="select-modal" data-modal-toggle="select-modal"
             class="flex justify-center items-center w-[52px] h-[52px] text-blue-800 hover:text-blue-900 bg-white rounded-full border border-gray-200 shadow-xs hover:bg-gray-50 focus:ring-4 focus:ring-blue-500 focus:outline-none">
@@ -253,17 +277,6 @@
                     </div>
 
                     <div class="col-span-2 sm:col-span-1">
-                        <label for="herramienta_cobro" class="block mb-2 text-sm font-medium text-gray-900">Herramienta
-                            de Cobro</label>
-                        <select id="herramienta_cobro" name="herramienta_cobro" required
-                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5">
-                            <option selected disabled>Seleccione una herramienta</option>
-                            <option value="Llamada telefónica">Llamada telefónica</option>
-                            <option value="Whatsapp corporativo">Whatsapp corporativo</option>
-                        </select>
-                    </div>
-
-                    <div class="col-span-2 sm:col-span-1">
                         <label for="estado_llamada" class="block mb-2 text-sm font-medium text-gray-900">Estado de la
                             Llamada</label>
                         <select id="estado_llamada" name="estado_llamada" required
@@ -274,18 +287,6 @@
                             <option value="Número no existe">Número no existe</option>
                             <option value="No contestada">No contestada</option>
                             <option value="Lineas Ocupadas">Lineas Ocupadas</option>
-                            <option value="Whatsapp">Whatsapp</option>
-                        </select>
-                    </div>
-
-                    <div class="col-span-2 sm:col-span-1">
-                        <label for="tipo_base" class="block mb-2 text-sm font-medium text-gray-900">Tipo de Base</label>
-                        <select id="tipo_base" name="tipo_base" required
-                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5">
-                            <option selected disabled>Seleccione un tipo</option>
-                            <option value="Base de Bienvenida">Base de Bienvenida</option>
-                            <option value="Fidelización">Fidelización</option>
-                            <option value="Cobranza">Cobranza</option>
                         </select>
                     </div>
 
@@ -327,11 +328,33 @@
                         </select>
                     </div>
 
-                    <div class="col-span-2">
+                    <div class="col-span-2 sm:col-span-1">
+                        <label for="tipo_base" class="block mb-2 text-sm font-medium text-gray-900">Tipo de Base</label>
+                        <select id="tipo_base" name="tipo_base" required
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5">
+                            <option selected disabled>Seleccione un tipo</option>
+                            <option value="Base de Bienvenida">Base de Bienvenida</option>
+                            <option value="Fidelización">Fidelización</option>
+                            <option value="Cobranza">Cobranza</option>
+                        </select>
+                    </div>
+
+                    <div class="col-span-2 sm:col-span-1">
                         <label for="proxima_llamada" class="block mb-2 text-sm font-medium text-gray-900">Fecha de la
                             Próxima Llamada</label>
-                        <input type="datetime-local" id="proxima_llamada" name="proxima_llamada" required
-                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 h-[42px]">
+                        <div class="relative max-w-sm">
+                            <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                                <svg class="w-4 h-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                    fill="currentColor" viewBox="0 0 20 20">
+                                    <path
+                                        d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
+                                </svg>
+                            </div>
+                            <input name="proxima_llamada" id="datepicker-actions" datepicker datepicker-buttons
+                                datepicker-autoselect-today type="text"
+                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5"
+                                placeholder="Selecciona una fecha" required>
+                        </div>
                     </div>
 
                     <div class="col-span-2">
@@ -357,7 +380,7 @@
     </div>
 </div>
 
-<form method="POST" action="/info_cliente/{{datos.numero}}/">
+<form method="POST" action="/reportar_estado?numero={{datos.numero}}">
 
     <!-- Main modal -->
     <div id="select-modal" tabindex="-1" aria-hidden="true"

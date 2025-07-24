@@ -49,7 +49,7 @@ def login():
         try:
             conn = get_sqlserver_connection1()
             cursor = conn.cursor()
-            cursor.execute(f"SELECT id, username, pass, active FROM users_new WHERE username = ?", username)
+            cursor.execute(f"SELECT id, username, pass, active, rol FROM users_new WHERE username = ?", username)
             row = cursor.fetchone()
 
             cursor.close()
@@ -59,13 +59,15 @@ def login():
                 flash("Nombre o contraseña incorrectos", "error")
                 return render_template("login.html")
 
-            id, user_name, hashed_pass, is_active = row
+            id, user_name, hashed_pass, is_active, rol = row
 
-            if hashed_pass != password:
+            if not check_password_hash(hashed_pass, password):
                 flash("Nombre o contraseña incorrectos", "error")
                 return render_template("login.html")
 
             session["user_id"] = id
+            session["user_name"] = user_name
+            session["rol"] = rol
 
             return redirect("/")
 
@@ -76,6 +78,8 @@ def login():
 
     else:
         return render_template("login.html")
+
+        
 @app.route("/", methods=["GET", "POST"])
 @login_required
 def index():
@@ -213,60 +217,79 @@ def logout():
     session.clear()
     return redirect("/login")
 
-@app.route("/exito")
-def exito():
-    motivos_estado = [
-    "Baja Administrativa Sin Penalización",
-    "Baja Voluntaria",
-    "Cobranza Activa",
-    "Falta de información PBDC",
-    "Reporte al Buro",
-    "Saneado Interno"
-    ]
-    return render_template("descargar.html", motivos_estado=motivos_estado)
 
 
 @app.route("/info_cliente/<numero>/", methods=["GET", "POST"])
 @login_required
 def info_cliente(numero):
-    if request.method == "GET":
-        conn = get_sqlserver_connection1()
-        cursor = conn.cursor()
-        cursor.execute(f"SELECT * FROM actual WHERE numero = {numero}")
-        datos = cursor.fetchone()
-        
-        cursor.execute(f"SELECT * FROM historial_llamadas WHERE numero = {numero} ORDER BY fecha_registro DESC")
-        llamadas = cursor.fetchall()
-        cursor.close()
-        conn.close()
+    conn = get_sqlserver_connection1()
+    cursor = conn.cursor()
 
-        motivos_estado = [
-            "Baja Administrativa Sin Penalización",
-            "Baja Voluntaria",
-            "Cobranza Activa",
-            "Falta de información PBDC",
-            "Reporte al Buro",
-            "Saneado Interno"
-        ]
+    # Obtener columnas de la tabla 'actual'
+    cursor.execute(f"SELECT * FROM actual WHERE numero = {numero}")
+    columnas_actual = [col[0] for col in cursor.description]
+    fila_actual = cursor.fetchone()
 
-        return render_template("info_cliente.html", datos=datos, llamadas = llamadas, motivos_estado=motivos_estado)
-    
+    # Reemplazar None por "" en los datos de 'actual'
+    if fila_actual:
+        datos = {col: (val if val is not None else "") for col, val in zip(columnas_actual, fila_actual)}
     else:
-        estado = request.form.get('estado')
-        comentario = request.form.get('comentarios')
+        datos = {}
 
-        if not estado:
-            flash("Debe seleccionar un estado", "error")
-            return redirect(request.url)  
-        if not comentario:
-            flash("Debe escribir un comentario", "error")
-            return redirect(request.url)  
-        
-        # Aquí haces lo que necesites con los datos: guardarlos, imprimirlos, etc.
-        print(f"Estado: {estado}, Comentario: {comentario}")
-        flash("Estado reportado satisfactoriamente", "exito")
-        return redirect(request.url) 
+    # Obtener columnas de la tabla 'historial_llamadas'
+    cursor.execute(f"SELECT * FROM historial_llamadas WHERE numero = {numero} ORDER BY fecha_registro DESC")
+    columnas_llamadas = [col[0] for col in cursor.description]
+    filas_llamadas = cursor.fetchall()
 
+    # Reemplazar None por "" en los datos de 'llamadas'
+    llamadas = [
+        {col: (val if val is not None else "") for col, val in zip(columnas_llamadas, fila)}
+        for fila in filas_llamadas
+    ]
+
+    cursor.close()
+    conn.close()
+
+    motivos_estado = [
+        "Baja Administrativa Sin Penalización",
+        "Baja Voluntaria",
+        "Cobranza Activa",
+        "Falta de información PBDC",
+        "Reporte al Buro",
+        "Saneado Interno"
+    ]
+
+    return render_template("info_cliente.html", datos=datos, llamadas = llamadas, motivos_estado=motivos_estado)
+    
+    
+
+@app.route('/reportar_estado', methods=['POST'])
+@login_required
+def reportar_estado():
+    numero  = request.args.get('numero')
+    estado = request.form.get('estado')
+    comentario = request.form.get('comentarios')
+
+    if not estado:
+        flash("Debe seleccionar un estado", "error")
+        return redirect(request.url)  
+    if not comentario:
+        flash("Debe escribir un comentario", "error")
+        return redirect(request.url)  
+    
+    conn = get_sqlserver_connection1()
+    cursor = conn.cursor()
+
+    cursor.execute(f"INSERT INTO reporte_estado (numero, estado, comentario, usuario, fecha_registro) VALUES (?, ?, ?, ?, GETDATE())", (numero, estado, comentario, session['user_name']))
+    cursor.execute(f"UPDATE actual SET estado_final = ? WHERE numero = {numero}", estado)
+    conn.commit()
+
+    cursor.close()
+    conn.close()
+
+    print(f"Estado: {estado}, Comentario: {comentario}")
+    flash("Estado reportado satisfactoriamente", "exito")
+    return redirect(f"/info_cliente/{numero}")
 
 
 @app.route('/insertar_llamada', methods=['POST'])
@@ -274,21 +297,13 @@ def info_cliente(numero):
 def insertar_llamada():
     numero  = request.args.get('numero')
     gestion_cobro = request.form.get('gestion_cobro')
-    herramienta_cobro = request.form.get('herramienta_cobro')
     motivo_macro = request.form.get('motivo_macro')
     motivo_micro = request.form.get('motivo_micro')
-    proxima_llamada_raw = request.form.get('proxima_llamada')
+    proxima_llamada = request.form.get('proxima_llamada')
     estado_llamada = request.form.get('estado_llamada')
     comentario = request.form.get('comentarios')
-    usuario = 'EnriqueM'
-    rol = 0
-
-    # Validar formato de fecha
-    try:
-        fecha_llamada = datetime.fromisoformat(proxima_llamada_raw).strftime('%Y-%m-%d %H:%M:%S')
-    except ValueError:
-        flash("Fecha inválida. Intenta de nuevo.", "error")
-        return redirect(f"/info_cliente/{numero}")
+    usuario = session['user_name']
+    rol = session['rol']
 
     # Área según rol
     area_map = {0: 'CyC', 1: 'SAD', 2: 'Tiendas', 3: 'Telemarketing'}
@@ -306,7 +321,7 @@ def insertar_llamada():
             Proximo_Pago, ContactphoneNo, Realname, vigencia, distancia,
             fecha_renovacion, subsidio, Accion, estado_final, fecha_llamada,
             estado_llamada, Comentarios, usuario, fecha_registro, area,
-            gestion_cobro, herramienta_cobro, motivo_macro, motivo_micro
+            gestion_cobro, motivo_macro, motivo_micro
         )
         SELECT
             numero, numero_referido, canal_ventas, nombre_canal_ventas, FUR,
@@ -316,23 +331,25 @@ def insertar_llamada():
             recarga_mes_anterior, recarga_mes_actual, deuda_icrm, estatus_orion,
             Proximo_Pago, ContactphoneNo, Realname, vigencia, distancia,
             fecha_renovacion, subsidio, Accion, estado_final,
-            ?, ?, ?, ?, GETDATE(), ?, ?, ?, ?, ?
+            ?, ?, ?, ?, GETDATE(), ?, ?, ?, ?
         FROM actual
         WHERE numero = ?
     """, (
-        fecha_llamada,
+        proxima_llamada,
         estado_llamada,
         comentario,
         usuario,
         area,
         gestion_cobro,
-        herramienta_cobro,
         motivo_macro,
         motivo_micro,
         numero
     ))
 
     conn.commit()
+
+    cursor.close()
+    conn.close()
     flash("Llamada registrada correctamente", "exito")
     return redirect(f"/info_cliente/{numero}")
 

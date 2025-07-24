@@ -130,10 +130,10 @@
       <tr onclick="window.location.href='/info_cliente/{{ item.numero }}'"
         class="bg-white border-b light:bg-gray-800 light:border-gray-700 border-gray-200 hover:bg-gray-50 light:hover:bg-gray-600 text-center">
         <th scope="row" class="px-4 py-2 font-medium text-gray-900 whitespace-nowrap light:text-white">
-          {{ item.numero }}
+          {{ item.numero}}
         </th>
         <td class="px-4 py-2">
-          {{ item.estatus_orion }}
+          {{ item.estatus_orion if item.estatus_orion else 'Sin estado'}}
         </td>
         <td class="px-4 py-2">
           {{ item.Realname }}
@@ -158,7 +158,7 @@
           </div>
         </td>
         <td class="px-4 py-2">
-          {{ item.estado_final }}
+          {{ item.estado_final if item.estado_final else 'Sin estado final'}}
         </td>
       </tr>
 

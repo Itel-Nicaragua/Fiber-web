@@ -1,4 +1,10 @@
 {
+  "name": "data-fiber-itel",
+  "version": "1.0.0",
+  "description": "Data Fiber Analytics",
+  "scripts": {
+    "build:css": "tailwindcss -i ./static/css/input.css -o ./static/css/output.css --minify"
+  },
   "devDependencies": {
     "@tailwindcss/cli": "^4.1.11",
     "tailwindcss": "^4.1.11"

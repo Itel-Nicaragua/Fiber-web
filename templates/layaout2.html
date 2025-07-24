@@ -21,6 +21,7 @@
 </head>
 
 <body class="bg-gray-100 font-poppins">
+  {% if session.user_id %}
   <button data-drawer-target="logo-sidebar" data-drawer-toggle="logo-sidebar" aria-controls="logo-sidebar" type="button"
     class="inline-flex items-center p-2 mt-2 ms-3 text-sm text-gray-500 rounded-lg sm:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 light:text-gray-400 light:hover:bg-gray-700 light:focus:ring-gray-600">
     <span class="sr-only">Open sidebar</span>
@@ -131,10 +132,13 @@
   </aside>
 
   <div class="sm:ml-64">
+    {% endif %}
     <!-- Main content -->
     <main class="flex-1 p-4 overflow-auto">
+     
       <!-- Flash Messages -->
       <div class="w-full">
+       
         <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
         {% if get_flashed_messages() %} {% with messages =
         get_flashed_messages(with_categories=true) %} {% for category, m in
@@ -153,6 +157,7 @@
       <section>{% block main %}{% endblock %}</section>
     </main>
   </div>
+
 
   <!-- Main modal -->
   <div id="default-modal" tabindex="-1" aria-hidden="true"
@@ -275,4 +280,5 @@
 <script src="https://cdn.jsdelivr.net/npm/simple-datatables@9.0.3"></script>
 <!-- Flatpickr JS -->
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
 </html>

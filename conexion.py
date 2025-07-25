@@ -2,6 +2,8 @@
 import pymysql
 import pyodbc
 import cx_Oracle
+import time
+
 
 # SQL Server 1
 SQL_SERVER_1_CONFIG = {
@@ -23,7 +25,7 @@ SQL_SERVER_2_CONFIG = {
 
 # MySQL
 MYSQL_CONFIG = {
-    'host': '172.16.120.74',
+    'host': '192.168.128.29',
     'user': 'root',
     'password': 'Perseo2016',
     'database': 'NOC_Ticket'
@@ -61,14 +63,17 @@ def get_sqlserver_connection2():
 
 
 def get_mysql_connection():
-    return pymysql.connect(
+    start = time.time()
+    conn = pymysql.connect(
         host=MYSQL_CONFIG['host'],
         user=MYSQL_CONFIG['user'],
         password=MYSQL_CONFIG['password'],
         database=MYSQL_CONFIG['database'],
-        cursorclass=pymysql.cursors.DictCursor
+        cursorclass=pymysql.cursors.DictCursor,
+        connect_timeout=5
     )
-
+    print("Tiempo conexión MySQL:", time.time() - start)
+    return conn
 
 def get_oracle_connection():
     return cx_Oracle.connect(

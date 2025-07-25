@@ -11,12 +11,14 @@ from helpers import admin_required, login_required, exportar_historial, exportar
 from flask import jsonify, send_file
 import pyodbc
 import tempfile
-from conexion import get_sqlserver_connection1
+from conexion import get_sqlserver_connection1, get_mysql_connection
 from math import ceil
 import math
 import pdfkit
 from datetime import datetime, timedelta
 import logging
+import time
+
 
 app = Flask(__name__)
 
@@ -265,9 +267,26 @@ def info_cliente(numero):
         "Saneado Interno"
     ]
 
+    conn = get_mysql_connection()
+    cursor = conn.cursor()
+    start = time.time()
+
+    cursor.execute(f"""SELECT postventa.*, place, price FROM postventa
+    INNER JOIN Customers ON id_customer = id_cliente
+    INNER JOIN places ON places.id_place = postventa.id_place
+    INNER JOIN bandwidth_price ON id_price_new = bandwidth_price.id_bandwidth_price
+    WHERE service_number = {numero} ORDER BY date_created DESC
+    """)
+
+    post_venta = cursor.fetchall()
+    print("Tiempo consulta postventa:", time.time() - start)
+
+    cursor.close()
+    conn.close()
+
     estado_cuenta = get_estado_cuenta(numero)
 
-    return render_template("info_cliente.html", datos=datos, llamadas = llamadas, motivos_estado=motivos_estado, estado_cuenta=estado_cuenta)
+    return render_template("info_cliente.html", datos=datos, llamadas = llamadas, motivos_estado=motivos_estado, estado_cuenta=estado_cuenta, post_venta=post_venta)
     
     
 
@@ -413,8 +432,14 @@ def get_estado_cuenta(numero):
     filas = cursor.fetchall()
 
     # Cálculos
-    total_pagado  = sum(f.monto    for f in filas)
-    total_deuda   = (sum(f.servicio for f in filas) + sum(f.equipos for f in filas)) - total_pagado
+
+    total_pagado = sum(f.monto if f.monto is not None else 0 for f in filas)
+
+    total_servicio = sum(f.servicio if f.servicio is not None else 0 for f in filas)
+    total_equipos = sum(f.equipos if f.equipos is not None else 0 for f in filas)
+
+    total_deuda = (total_servicio + total_equipos) - total_pagado
+
 
     # Contexto para Jinja
     contexto = {           # o dinámico
@@ -426,8 +451,9 @@ def get_estado_cuenta(numero):
               "cuota":    f.cuota,
               "mes":      f.mes,
               "monto":    f"{f.monto:.2f}",
-              "equipos":  f"{f.equipos:.2f}",
-              "servicio": f"{f.servicio:.2f}"
+              "equipos":  f"${f.equipos:.2f}" if f.equipos is not None else "",
+              "servicio": f"${f.servicio:.2f}" if f.servicio is not None else "",
+
             }
             for f in filas
         ]

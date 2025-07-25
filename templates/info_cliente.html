@@ -73,6 +73,26 @@
                     </div>
                 </section>
 
+                {% if post_venta %}
+                <!-- Info post venta  -->
+                <section>
+                    <h2 class="text-xl font-semibold text-blue-900 border-b border-gray-300 pt-5"><i class="fa-solid fa-file-signature">
+
+                    </i> Tramites de post venta</h2>
+                    {% for info in post_venta %}
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 border-b border-gray-300 pb-2 pt-5">
+                        <p><span class="font-bold">Gesti&oacute;n:</span> {{info.codigo_postventa}}</p>
+                        <p><span class="font-bold">Lugar:</span> {{info.place}}</p>
+                        <p><span class="font-bold">Fecha de creaci&oacute;n:</span> {{info.date_created}}</p>
+                        <p><span class="font-bold">Nuevo precio:</span> ${{info.price}}</p>
+                        <p><span class="font-bold">Vigencia:</span> {{info.facturas_pagadas}}</p>
+                        <p><span class="font-bold">Tipo de cambio de velocidad:</span> {{info.tipo_cambio_velocidad}}</p>
+                        <p class="col-span-full"><span class="font-bold">Comentario final:</span> {{info.comentario_final}}</p>
+                    </div>
+                    {% endfor %}
+                </section>
+                {% endif %}
+
             </div>
 
 
@@ -267,8 +287,8 @@
                     cobro</label>
                 <ul class="grid w-full gap-6 md:grid-cols-2 mb-2" id="herramienta_cobro">
                     <li id="herramienta_cobro">
-                        <input type="radio" id="llamada_telefonica" name="herramienta_cobro" value="Llamada telefónica" class="hidden peer"
-                            required />
+                        <input type="radio" id="llamada_telefonica" name="herramienta_cobro" value="Llamada telefónica"
+                            class="hidden peer" required />
                         <label for="llamada_telefonica"
                             class="inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border border-gray-200 rounded-lg cursor-pointer peer-checked:border-blue-600 peer-checked:text-blue-600 hover:text-gray-600 hover:bg-gray-100">
                             <div class="block">
@@ -278,7 +298,8 @@
                         </label>
                     </li>
                     <li>
-                        <input type="radio" id="whatsapp_corporativo" name="herramienta_cobro" value="Whatsapp corporativo" class="hidden peer">
+                        <input type="radio" id="whatsapp_corporativo" name="herramienta_cobro"
+                            value="Whatsapp corporativo" class="hidden peer">
                         <label for="whatsapp_corporativo"
                             class="inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border border-gray-200 rounded-lg cursor-pointer peer-checked:border-blue-600 peer-checked:text-blue-600 hover:text-gray-600 hover:bg-gray-100">
                             <div class="block">
@@ -561,8 +582,8 @@
                                 <td class="px-4 py-3">{{ r.cuota }}</td>
                                 <td class="px-4 py-3">{{ r.mes }}</td>
                                 <td class="px-4 py-3 font-medium text-green-600">${{ r.monto }}</td>
-                                <td class="px-4 py-3">${{ r.equipos }}</td>
-                                <td class="px-4 py-3">${{ r.servicio }}</td>
+                                <td class="px-4 py-3">{{ r.equipos }}</td>
+                                <td class="px-4 py-3">{{ r.servicio }}</td>
                             </tr>
                             {% endfor %}
                         </tbody>

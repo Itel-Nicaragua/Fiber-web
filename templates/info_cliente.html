@@ -84,7 +84,7 @@
                         <span
                             class="absolute flex items-center justify-center w-6 h-6 rounded-full -start-3 ring-8 ring-white  {% if llamada.estado_llamada == 'Exitosa' %}bg-green-100{% else %}bg-red-100{% endif %}">
                             <i
-                                class="fa fa-phone text-xs {% if llamada.estado_llamada == 'Exitosa' %}text-green-500{% else %}text-red-500{% endif %}"></i>
+                                class="{% if llamada.herramienta_cobro == 'Whatsapp corporativo' %} fa-brands fa-whatsapp  {% else %} fa fa-phone text-xs {% endif %} {% if llamada.estado_llamada == 'Exitosa' %}text-green-500{% else %}text-red-500{% endif %}"></i>
                         </span>
                         <h3 class="flex items-center mb-1 text-lg font-bold text-gray-900">
                             {{llamada.estado_llamada}}
@@ -99,8 +99,8 @@
                         <p class="mb-4 text-base font-normal text-gray-500">{{llamada.Comentarios}}
                         </p>
                         <div class="flex justify-end space-y-2"> <!-- Alinea el realizada por a la derecha -->
-                          <!-- <p><span class="text-sm text-gray-500 italic">Herramienta de cobro: {{llamada.herramienta_cobro}}</span></p>  -->
-                          <p><span class="text-sm text-gray-500 italic">Realizada por: {{llamada.usuario}}</span></p> 
+                            <!-- <p><span class="text-sm text-gray-500 italic">Herramienta de cobro: {{llamada.herramienta_cobro}}</span></p>  -->
+                            <p><span class="text-sm text-gray-500 italic">Realizada por: {{llamada.usuario}}</span></p>
                         </div>
                     </li>
 
@@ -263,6 +263,31 @@
             </div>
             <!-- Modal body -->
             <form class="p-4 md:p-5" action="/insertar_llamada?numero={{datos.numero}}" method="POST">
+                <label for="herramienta_cobro" class="block mb-2 text-sm font-medium text-gray-900">Herramienta de
+                    cobro</label>
+                <ul class="grid w-full gap-6 md:grid-cols-2 mb-2" id="herramienta_cobro">
+                    <li id="herramienta_cobro">
+                        <input type="radio" id="llamada_telefonica" name="herramienta_cobro" value="Llamada telefónica" class="hidden peer"
+                            required />
+                        <label for="llamada_telefonica"
+                            class="inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border border-gray-200 rounded-lg cursor-pointer peer-checked:border-blue-600 peer-checked:text-blue-600 hover:text-gray-600 hover:bg-gray-100">
+                            <div class="block">
+                                <div class="w-full text-gray-900 text-sm">Llamada telefónica</div>
+                            </div>
+                            <i class="fa-solid fa-phone"></i>
+                        </label>
+                    </li>
+                    <li>
+                        <input type="radio" id="whatsapp_corporativo" name="herramienta_cobro" value="Whatsapp corporativo" class="hidden peer">
+                        <label for="whatsapp_corporativo"
+                            class="inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border border-gray-200 rounded-lg cursor-pointer peer-checked:border-blue-600 peer-checked:text-blue-600 hover:text-gray-600 hover:bg-gray-100">
+                            <div class="block">
+                                <div class="w-full text-gray-900 text-sm">Whatsapp corporativo</div>
+                            </div>
+                            <i class="fa-brands fa-whatsapp text-xl"></i>
+                        </label>
+                    </li>
+                </ul>
                 <div class="grid gap-4 mb-4 grid-cols-2">
                     <div class="col-span-2 sm:col-span-1">
                         <label for="gestion_cobro" class="block mb-2 text-sm font-medium text-gray-900">Gestión de
@@ -274,16 +299,6 @@
                             <option value="Cobro de Renta">Cobro de Renta</option>
                             <option value="Cobro de Subsidio">Cobro de Subsidio</option>
                             <option value="Reactivación">Reactivación</option>
-                        </select>
-                    </div>
-                    <div class="col-span-2 sm:col-span-1">
-                        <label for="gestion_cobro" class="block mb-2 text-sm font-medium text-gray-900">Herramienta de
-                            cobro</label>
-                        <select id="gestion_cobro" name="herramienta_cobro" required
-                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5">
-                            <option selected disabled>Seleccione una herramienta</option>
-                            <option value="Llamada telefónica">Llamada telefónica</option>
-                            <option value="Whatsapp corporativo">Whatsapp corporativo</option>
                         </select>
                     </div>
 
@@ -350,7 +365,7 @@
                         </select>
                     </div>
 
-                    <div class="col-span-2">
+                    <div class="col-span-2 sm:col-span-1">
                         <label for="proxima_llamada" class="block mb-2 text-sm font-medium text-gray-900">Fecha de la
                             Próxima Llamada</label>
                         <div class="relative max-w-sm">
@@ -499,8 +514,7 @@
         <!-- Modal content -->
         <div class="relative bg-white rounded-lg shadow-sm">
             <!-- Modal header -->
-            <div
-                class="flex items-center justify-between p-4 md:p-5 border-b rounded-t border-gray-200">
+            <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t border-gray-200">
                 <div class="flex items-center text-2xl font-semibold text-gray-900">
                     <img class="w-15 h-10 mr-2" src="/static/imagenes/logo.png" alt="logo">
                     Estado de cuenta: {{datos.numero}}
@@ -521,14 +535,14 @@
                 <!-- Encabezado con estilo profesional -->
                 <div class="space-y-3">
                     <h4 class="text-lg font-bold text-gray-800 border-b pb-2 border-gray-200">Datos Generales</h4>
-                        <div class="flex items-start">
-                            <p><span class="font-bold text-gray-700 ">Nombre: </span> {{ datos.Realname }}</p>
-                        </div>
-                        <div class="flex items-start">
-                            <p><span class="font-bold text-gray-700 ">Dirección: </span>{{ datos.direccion }}</p>
-                        </div>
+                    <div class="flex items-start">
+                        <p><span class="font-bold text-gray-700 ">Nombre: </span> {{ datos.Realname }}</p>
+                    </div>
+                    <div class="flex items-start">
+                        <p><span class="font-bold text-gray-700 ">Dirección: </span>{{ datos.direccion }}</p>
+                    </div>
                 </div>
-            
+
                 <!-- Tabla con estilo profesional y colores sutiles -->
                 <div class="border border-gray-200 rounded-lg overflow-hidden">
                     <table class="w-full text-sm text-center text-gray-700">
@@ -554,7 +568,7 @@
                         </tbody>
                     </table>
                 </div>
-            
+
                 <!-- Totales con destaque profesional -->
                 <div class="flex flex-col sm:flex-row justify-between gap-4 pt-2">
                     <div class="bg-blue-50 px-4 py-3 rounded-lg border border-blue-200">

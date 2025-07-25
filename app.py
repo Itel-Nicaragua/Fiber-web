@@ -52,14 +52,17 @@ def login():
             cursor.execute(f"SELECT id, username, pass, active, rol FROM users_new WHERE username = ?", username)
             row = cursor.fetchone()
 
-            cursor.close()
-            conn.close()
-
             if not row:
                 flash("Nombre o contraseña incorrectos", "error")
                 return render_template("login.html")
 
             id, user_name, hashed_pass, is_active, rol = row
+
+            cursor.execute("INSERT INTO ingresos_users (name_user, fecha_ingreso) VALUES (?, GETDATE())", user_name)
+            conn.commit()
+
+            cursor.close()
+            conn.close()
 
             if not check_password_hash(hashed_pass, password):
                 flash("Nombre o contraseña incorrectos", "error")

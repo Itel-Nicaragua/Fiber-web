@@ -175,46 +175,60 @@ def index():
         logging.error(f"Error en index: {e}", exc_info=True)
         return render_template("index.html")
 
+# Mapa de códigos a nombres legibles
+TIPOS_EXPORT = {
+    "BT": "base_total",
+    "BL": "historial_llamadas",
+    "BTM": "historial_telemarketing"
+}
+
 @app.route("/export_excel", methods=["POST"])
 @login_required
 def export_excel():
-
-    tipo = request.form.get("tipo-export")
+    tipo  = request.form.get("tipo-export")
     inicio = request.form.get("start")
-    final = request.form.get("end")
+    final  = request.form.get("end")
 
     if not tipo:
-        flash("Debe seleccionar un tipo de exportacion", "error")
+        flash("Debe seleccionar un tipo de exportación", "error")
         return redirect("/")
     if not inicio or not final:
         flash("Debe seleccionar ambas fechas", "error")
         return redirect("/")
-    
+
+    # Genera el DataFrame según el tipo
     if tipo == "BT":
         df = exportar_base_total(inicio, final)
-    
     elif tipo == "BL":
         df = exportar_historial(inicio, final)
-    
     elif tipo == "BTM":
         df = exportar_historial_telemarketing(inicio, final)
-        
     else:
         flash("Tipo de exportación no válido", "error")
         return redirect("/")
 
-    return descargar_excel(df)
-        
+    # Nombre legible según el tipo
+    nombre_tipo = TIPOS_EXPORT.get(tipo, "exportacion")
+    # Fecha en formato YYYYMMDD
+    fecha_descarga = datetime.now().strftime("%Y%m%d")
+    # Construye el nombre final
+    filename = f"{nombre_tipo}_{fecha_descarga}.xlsx"
+
+    return descargar_excel(df, filename)
 
 
-def descargar_excel(df):
+def descargar_excel(df, filename):
+    """
+    Crea un archivo temporal .xlsx a partir del DataFrame y lo envía
+    con el nombre que le pasemos en 'download_name'.
+    """
     temp = tempfile.NamedTemporaryFile(delete=False, suffix=".xlsx")
     df.to_excel(temp.name, index=False)
 
     return send_file(
         temp.name,
         as_attachment=True,
-        download_name="historial.xlsx",
+        download_name=filename,
         mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
 

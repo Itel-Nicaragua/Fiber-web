@@ -286,9 +286,9 @@ def info_cliente(numero):
     start = time.time()
 
     cursor.execute(f"""SELECT postventa.*, place, price FROM postventa
-    INNER JOIN Customers ON id_customer = id_cliente
-    INNER JOIN places ON places.id_place = postventa.id_place
-    INNER JOIN bandwidth_price ON id_price_new = bandwidth_price.id_bandwidth_price
+    LEFT JOIN Customers ON id_customer = id_cliente
+    LEFT JOIN places ON places.id_place = postventa.id_place
+    LEFT JOIN bandwidth_price ON id_price_new = bandwidth_price.id_bandwidth_price
     WHERE service_number = {numero} ORDER BY date_created DESC
     """)
 

@@ -114,10 +114,10 @@
                             <p><span class="font-bold">Gesti&oacute;n:</span> {{info.codigo_postventa}}</p>
                             <p><span class="font-bold">Lugar:</span> {{info.place}}</p>
                             <p><span class="font-bold">Fecha de creaci&oacute;n:</span> {{info.date_created}}</p>
-                            <p><span class="font-bold">Nuevo precio:</span> ${{info.price}}</p>
+                            <p><span class="font-bold">Nuevo precio:</span> ${{info.price if info.price else ''}}</p>
                             <p><span class="font-bold">Vigencia:</span> {{info.facturas_pagadas}}</p>
                             <p><span class="font-bold">Tipo de cambio de velocidad:</span>
-                                {{info.tipo_cambio_velocidad}}</p>
+                                {{info.tipo_cambio_velocidad if info.tipo_cambio_velocidad else ''}}</p>
                             <p class="col-span-full"><span class="font-bold">Comentario final:</span>
                                 {{info.comentario_final}}</p>
                         </div>

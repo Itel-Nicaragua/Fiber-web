@@ -2660,6 +2660,9 @@
   .capitalize {
     text-transform: capitalize;
   }
+  .normal-case {
+    text-transform: none;
+  }
   .uppercase {
     text-transform: uppercase;
   }

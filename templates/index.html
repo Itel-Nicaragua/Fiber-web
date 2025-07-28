@@ -135,8 +135,8 @@
         <td class="px-4 py-2">
           {{ item.estatus_orion if item.estatus_orion else 'Sin estado'}}
         </td>
-        <td class="px-4 py-2">
-          {{ item.Realname }}
+        <td class="px-4 py-2 capitalize">
+          {{ item.Realname | lower if item.Realname else 'Sin nombre'}}
         </td>
         <td class="px-4 py-2">
           {{ item.fecha_suscripcion }}
@@ -145,7 +145,7 @@
           {{ item.departamento }}
         </td>
         <td class="px-4 py-2">
-          {{ item.deuda_icrm }}
+          ${{ item.deuda_icrm }}
         </td>
         <td class="px-4 py-2">
           {{ item.Proximo_Pago }}

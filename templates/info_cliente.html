@@ -12,7 +12,7 @@
                     <h2 class="text-xl font-semibold text-blue-900 mb-4 border-b border-gray-300 pb-2  pt-5"><i
                             class="fa fa-user"></i> Información del Cliente</h2>
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <p><span class="font-bold">Nombre:</span> {{datos.Realname}}</p>
+                        <p class="capitalize"><span class="font-bold">Nombre:</span> {{datos.Realname | lower}}</p>
                         <p><span class="font-bold">Cédula:</span> {{datos.cedula}}</p>
                         <p><span class="font-bold">Teléfono:</span> {{datos.ContactphoneNo}}</p>
                         <p><span class="font-bold">Departamento:</span> {{datos.departamento}}</p>
@@ -28,7 +28,7 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                         <p><span class="font-bold">Número de referido:</span> {{datos.numero_referido}}</p>
                         <p><span class="font-bold">Canal de venta:</span> {{datos.canal_ventas}}</p>
-                        <p><span class="font-bold">Nombre referido:</span> {{datos.nombre_canal_ventas}}</p>
+                        <p class="capitalize"><span class="font-bold normal-case">Nombre referido:</span> {{datos.nombre_canal_ventas | lower}}</p>
                     </div>
                 </section>
 

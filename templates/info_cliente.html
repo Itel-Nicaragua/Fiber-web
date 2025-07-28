@@ -2,247 +2,232 @@
 
 <div class="bg-white border border-gray-200 rounded-lg shadow-sm">
     <!-- Contenido de cada tab -->
+
+    <div class="w-full mt-10">
+        <div class="grid max-w-xs grid-cols-2 gap-1 p-1 mx-auto my-2 bg-gray-100 rounded-lg" role="group">
+            <button data-tooltip-target="tooltip-cliente" data-tab="tab1"
+                class="tab-btn px-5 py-1.5 text-xs font-medium text-white bg-blue-900 rounded-lg">
+                <i class="fa fa-user"></i>
+            </button>
+            <div id="tooltip-cliente" role="tooltip"
+                class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip">
+                Información del cliente
+                <div class="tooltip-arrow" data-popper-arrow></div>
+            </div>
+
+            <button data-tooltip-target="tooltip-llamadas" data-tab="tab2"
+                class="tab-btn px-5 py-1.5 text-xs font-medium text-white bg-blue-900 rounded-lg">
+                <i class="fa fa-phone"></i>
+            </button>
+            <div id="tooltip-llamadas" role="tooltip"
+                class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip">
+                Registros de llamadas
+                <div class="tooltip-arrow" data-popper-arrow></div>
+            </div>
+
+        </div>
+    </div>
     <div class="mt-4">
         <div class="max-w-7xl mx-auto space-y-2">
+            <div id="tabs-wrapper" class="max-w-7xl mx-auto space-y-2">
 
-            <div id="tab1" class="tab-content">
+                <div id="tab1" class="tab-content block">
 
-                <!-- Información del Cliente -->
-                <section>
-                    <h2 class="text-xl font-semibold text-blue-900 mb-4 border-b border-gray-300 pb-2  pt-5"><i
-                            class="fa fa-user"></i> Información del Cliente</h2>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <p class="capitalize"><span class="font-bold">Nombre:</span> {{datos.Realname | lower}}</p>
-                        <p><span class="font-bold">Cédula:</span> {{datos.cedula}}</p>
-                        <p><span class="font-bold">Teléfono:</span> {{datos.ContactphoneNo}}</p>
-                        <p><span class="font-bold">Departamento:</span> {{datos.departamento}}</p>
-                        <p class="col-span-semi-full"><span class="font-bold">Dirección:</span> {{datos.direccion }}</p>
+                    <!-- Información del Cliente -->
+                    <section>
+                        <h2 class="text-xl font-semibold text-blue-900 mb-4 border-b border-gray-300 pb-2  pt-5"><i
+                                class="fa fa-user"></i> Información del Cliente</h2>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <p class="capitalize"><span class="font-bold">Nombre:</span> {{datos.Realname | lower}}</p>
+                            <p><span class="font-bold">Cédula:</span> {{datos.cedula}}</p>
+                            <p><span class="font-bold">Teléfono:</span> {{datos.ContactphoneNo}}</p>
+                            <p><span class="font-bold">Departamento:</span> {{datos.departamento}}</p>
+                            <p class="col-span-semi-full"><span class="font-bold">Dirección:</span> {{datos.direccion }}
+                            </p>
 
-                    </div>
-                </section>
-
-                <!-- Referido -->
-                <section>
-                    <h2 class="text-xl font-semibold text-blue-900 mb-4 border-b border-gray-300 pb-2 pt-5"><i
-                            class="fa fa-users"></i> Referido</h2>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <p><span class="font-bold">Número de referido:</span> {{datos.numero_referido}}</p>
-                        <p><span class="font-bold">Canal de venta:</span> {{datos.canal_ventas}}</p>
-                        <p class="capitalize"><span class="font-bold normal-case">Nombre referido:</span> {{datos.nombre_canal_ventas | lower}}</p>
-                    </div>
-                </section>
-
-                <!-- Producto -->
-                <section>
-                    <h2 class="text-xl font-semibold text-blue-900 mb-4 border-b border-gray-300 pb-2 pt-5"><i
-                            class="fa fa-boxes-packing"></i> Producto</h2>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <p class="col-span-full"><span class="font-bold">Paquete:</span> {{datos.paquete}}</p>
-                        <p><span class="font-bold">Código OA:</span> {{datos.Codigo_OA}}</p>
-                        <p><span class="font-bold">Tipo de cliente:</span> {{datos.tipo_cliente}}</p>
-                        <p><span class="font-bold">Línea:</span> {{datos.numero}}</p>
-                        <p><span class="font-bold">Fecha de renovación:</span> {{datos.fecha_renovacion}}</p>
-                        <p><span class="font-bold">Fecha de suscripción:</span> {{datos.fecha_suscripcion}}</p>
-                        <p><span class="font-bold">Ancho de banda:</span> {{datos.AnchoBanda}}</p>
-                        <p><span class="font-bold">Ciclo:</span> {{datos.ciclo}}</p>
-                        <p><span class="font-bold">Precio:</span> ${{datos.precio}}</p>
-                        <p><span class="font-bold">Próxima fecha de pago:</span> {{datos.Proximo_Pago}}</p>
-                        <p><span class="font-bold">Vigencia:</span> {{datos.vigencia}}</p>
-                        <p><span class="font-bold">Distancia (mts):</span> {{datos.distancia}}</p>
-                    </div>
-                </section>
-
-                <!-- Cobranza -->
-                <section>
-                    <h2 class="text-xl font-semibold text-blue-900 mb-4 border-b border-gray-300 pb-2 pt-5"><i
-                            class="fa fa-coins"></i> Información de Cobranza</h2>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <p><span class="font-bold">Suma de recargas:</span> ${{datos.suma_recargas}}</p>
-                        <p><span class="font-bold">Recarga por ajuste:</span> ${{datos.recarga_ajuste}}</p>
-                        <p><span class="font-bold">Recarga mes anterior:</span> ${{datos.recarga_mes_anterior}}</p>
-                        <p><span class="font-bold">Recarga mes actual:</span> ${{datos.recarga_mes_actual}}</p>
-                        <p><span class="font-bold">Deuda en ICRM:</span> ${{datos.deuda_icrm}}</p>
-                        <p><span class="font-bold">Fecha de última recarga:</span> {{datos.FUR}}</p>
-                        <p><span class="font-bold">Días en mora:</span> {{datos.diasMora}}</p>
-                        <p><span class="font-bold">Estado del contrato:</span> {{datos.estatus_contrato}}</p>
-                        <p><span class="font-bold">Antigüedad (meses):</span> {{datos.antiguedad_meses}}</p>
-                        <p><span class="font-bold">Deuda por subsidio:</span> ${{datos.subsidio}}</p>
-                        <p><span class="font-bold">Acción:</span> {{datos.Accion}}</p>
-                        <p><span class="font-bold">Estado Orion:</span> {{datos.estatus_orion}}</p>
-                        <p><span class="font-bold">Reclamos:</span> {{datos.NoReclamos}}</p>
-                    </div>
-                </section>
-
-                {% if post_venta %}
-                <!-- Info post venta  -->
-                <section>
-                    <h2 class="text-xl font-semibold text-blue-900 border-b border-gray-300 pt-5"><i class="fa-solid fa-file-signature">
-
-                    </i> Tramites de post venta</h2>
-                    {% for info in post_venta %}
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 border-b border-gray-300 pb-2 pt-5">
-                        <p><span class="font-bold">Gesti&oacute;n:</span> {{info.codigo_postventa}}</p>
-                        <p><span class="font-bold">Lugar:</span> {{info.place}}</p>
-                        <p><span class="font-bold">Fecha de creaci&oacute;n:</span> {{info.date_created}}</p>
-                        <p><span class="font-bold">Nuevo precio:</span> ${{info.price}}</p>
-                        <p><span class="font-bold">Vigencia:</span> {{info.facturas_pagadas}}</p>
-                        <p><span class="font-bold">Tipo de cambio de velocidad:</span> {{info.tipo_cambio_velocidad}}</p>
-                        <p class="col-span-full"><span class="font-bold">Comentario final:</span> {{info.comentario_final}}</p>
-                    </div>
-                    {% endfor %}
-                </section>
-                {% endif %}
-
-            </div>
-
-
-            <div id="tab2" class="tab-content hidden">
-
-                <ol class="relative border-s border-gray-200">
-                    {% for llamada in llamadas %}
-                    <li class="mb-10 ms-6">
-                        <span
-                            class="absolute flex items-center justify-center w-6 h-6 rounded-full -start-3 ring-8 ring-white  {% if llamada.estado_llamada == 'Exitosa' %}bg-green-100{% else %}bg-red-100{% endif %}">
-                            <i
-                                class="{% if llamada.herramienta_cobro == 'Whatsapp corporativo' %} fa-brands fa-whatsapp  {% else %} fa fa-phone text-xs {% endif %} {% if llamada.estado_llamada == 'Exitosa' %}text-green-500{% else %}text-red-500{% endif %}"></i>
-                        </span>
-                        <h3 class="flex items-center mb-1 text-lg font-bold text-gray-900">
-                            {{llamada.estado_llamada}}
-                        </h3>
-                        <time class="block mb-2 text-sm font-normal leading-none text-gray-400">Realizada
-                            el:
-                            {{llamada.fecha_registro | date}}</time>
-                        <time class="block mb-2 text-sm font-normal leading-none text-gray-400">Fecha
-                            programada para la proxima llamada: {{llamada.fecha_llamada}}
-                        </time>
-                        <h4 class="flex items-center mb-1 font-semibold text-gray-900">Comentario:</h4>
-                        <p class="mb-4 text-base font-normal text-gray-500">{{llamada.Comentarios}}
-                        </p>
-                        <div class="flex justify-end space-y-2"> <!-- Alinea el realizada por a la derecha -->
-                            <!-- <p><span class="text-sm text-gray-500 italic">Herramienta de cobro: {{llamada.herramienta_cobro}}</span></p>  -->
-                            <p><span class="text-sm text-gray-500 italic">Realizada por: {{llamada.usuario}}</span></p>
                         </div>
-                    </li>
+                    </section>
 
-                    {% else %}
-                    <div class="flex flex-col items-center justify-center text-center py-20 px-6 bg-white">
-                        <div class="text-6xl text-red-600 mb-4">
-                            <i class="fa-solid fa-ban"></i>
+                    <!-- Referido -->
+                    <section>
+                        <h2 class="text-xl font-semibold text-blue-900 mb-4 border-b border-gray-300 pb-2 pt-5"><i
+                                class="fa fa-users"></i> Referido</h2>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <p><span class="font-bold">Número de referido:</span> {{datos.numero_referido}}</p>
+                            <p><span class="font-bold">Canal de venta:</span> {{datos.canal_ventas}}</p>
+                            <p class="capitalize"><span class="font-bold normal-case">Nombre referido:</span>
+                                {{datos.nombre_canal_ventas | lower}}</p>
                         </div>
-                        <h1 class="text-3xl font-semibold text-gray-800 mb-4">Sin llamadas registradas</h1>
-                        <p class="text-lg text-gray-600">
-                            Este cliente aún no tiene historial de llamadas disponibles en el sistema.
-                        </p>
-                    </div>
-            </div>
-            {% endfor %}
-            </ol>
-        </div>
+                    </section>
 
-        <div id="tab3" class="tab-content hidden">
-            <div class="flex flex-col items-center justify-center text-center py-20 px-6 bg-white">
-                <div class="text-6xl text-blue-900 mb-4">
-                    <i class="fa-solid fa-person-digging"></i>
+                    <!-- Producto -->
+                    <section>
+                        <h2 class="text-xl font-semibold text-blue-900 mb-4 border-b border-gray-300 pb-2 pt-5"><i
+                                class="fa fa-boxes-packing"></i> Producto</h2>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <p class="col-span-full"><span class="font-bold">Paquete:</span> {{datos.paquete}}</p>
+                            <p><span class="font-bold">Código OA:</span> {{datos.Codigo_OA}}</p>
+                            <p><span class="font-bold">Tipo de cliente:</span> {{datos.tipo_cliente}}</p>
+                            <p><span class="font-bold">Línea:</span> {{datos.numero}}</p>
+                            <p><span class="font-bold">Fecha de renovación:</span> {{datos.fecha_renovacion}}</p>
+                            <p><span class="font-bold">Fecha de suscripción:</span> {{datos.fecha_suscripcion}}</p>
+                            <p><span class="font-bold">Ancho de banda:</span> {{datos.AnchoBanda}}</p>
+                            <p><span class="font-bold">Ciclo:</span> {{datos.ciclo}}</p>
+                            <p><span class="font-bold">Precio:</span> ${{datos.precio}}</p>
+                            <p><span class="font-bold">Próxima fecha de pago:</span> {{datos.Proximo_Pago}}</p>
+                            <p><span class="font-bold">Vigencia:</span> {{datos.vigencia}}</p>
+                            <p><span class="font-bold">Distancia (mts):</span> {{datos.distancia}}</p>
+                        </div>
+                    </section>
+
+                    <!-- Cobranza -->
+                    <section>
+                        <h2 class="text-xl font-semibold text-blue-900 mb-4 border-b border-gray-300 pb-2 pt-5"><i
+                                class="fa fa-coins"></i> Información de Cobranza</h2>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <p><span class="font-bold">Suma de recargas:</span> ${{datos.suma_recargas}}</p>
+                            <p><span class="font-bold">Recarga por ajuste:</span> ${{datos.recarga_ajuste}}</p>
+                            <p><span class="font-bold">Recarga mes anterior:</span> ${{datos.recarga_mes_anterior}}</p>
+                            <p><span class="font-bold">Recarga mes actual:</span> ${{datos.recarga_mes_actual}}</p>
+                            <p><span class="font-bold">Deuda en ICRM:</span> ${{datos.deuda_icrm}}</p>
+                            <p><span class="font-bold">Fecha de última recarga:</span> {{datos.FUR}}</p>
+                            <p><span class="font-bold">Días en mora:</span> {{datos.diasMora}}</p>
+                            <p><span class="font-bold">Estado del contrato:</span> {{datos.estatus_contrato}}</p>
+                            <p><span class="font-bold">Antigüedad (meses):</span> {{datos.antiguedad_meses}}</p>
+                            <p><span class="font-bold">Deuda por subsidio:</span> ${{datos.subsidio}}</p>
+                            <p><span class="font-bold">Acción:</span> {{datos.Accion}}</p>
+                            <p><span class="font-bold">Estado Orion:</span> {{datos.estatus_orion}}</p>
+                            <p><span class="font-bold">Reclamos:</span> {{datos.NoReclamos}}</p>
+                        </div>
+                    </section>
+
+                    {% if post_venta %}
+                    <!-- Info post venta  -->
+                    <section>
+                        <h2 class="text-xl font-semibold text-blue-900 border-b border-gray-300 pt-5"><i
+                                class="fa-solid fa-file-signature">
+
+                            </i> Tramites de post venta</h2>
+                        {% for info in post_venta %}
+                        <div
+                            class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 border-b border-gray-300 pb-2 pt-5">
+                            <p><span class="font-bold">Gesti&oacute;n:</span> {{info.codigo_postventa}}</p>
+                            <p><span class="font-bold">Lugar:</span> {{info.place}}</p>
+                            <p><span class="font-bold">Fecha de creaci&oacute;n:</span> {{info.date_created}}</p>
+                            <p><span class="font-bold">Nuevo precio:</span> ${{info.price}}</p>
+                            <p><span class="font-bold">Vigencia:</span> {{info.facturas_pagadas}}</p>
+                            <p><span class="font-bold">Tipo de cambio de velocidad:</span>
+                                {{info.tipo_cambio_velocidad}}</p>
+                            <p class="col-span-full"><span class="font-bold">Comentario final:</span>
+                                {{info.comentario_final}}</p>
+                        </div>
+                        {% endfor %}
+                    </section>
+                    {% endif %}
+
                 </div>
-                <h1 class="text-3xl font-semibold text-gray-800 mb-4">Página en construcción</h1>
-                <p class="text-lg text-gray-600">
-                    Estamos trabajando para mejorar tu experiencia.<br>
-                    Muy pronto esta sección estará disponible.
-                </p>
-                <p class="mt-8 font-medium text-gray-700">Desarrollo Itel Nicaragua</p>
+
+
+                <div id="tab2" class="tab-content hidden">
+
+                    <ol class="relative border-s border-gray-200">
+                        {% for llamada in llamadas %}
+                        <li class="mb-10 ms-6">
+                            <span
+                                class="absolute flex items-center justify-center w-6 h-6 rounded-full -start-3 ring-8 ring-white  {% if llamada.estado_llamada == 'Exitosa' %}bg-green-100{% else %}bg-red-100{% endif %}">
+                                <i
+                                    class="{% if llamada.herramienta_cobro == 'Whatsapp corporativo' %} fa-brands fa-whatsapp  {% else %} fa fa-phone text-xs {% endif %} {% if llamada.estado_llamada == 'Exitosa' %}text-green-500{% else %}text-red-500{% endif %}"></i>
+                            </span>
+                            <h3 class="flex items-center mb-1 text-lg font-bold text-gray-900">
+                                {{llamada.estado_llamada}}
+                            </h3>
+                            <time class="block mb-2 text-sm font-normal leading-none text-gray-400">Realizada
+                                el:
+                                {{llamada.fecha_registro | date}}</time>
+                            <time class="block mb-2 text-sm font-normal leading-none text-gray-400">Fecha
+                                programada para la proxima llamada: {{llamada.fecha_llamada}}
+                            </time>
+                            <h4 class="flex items-center mb-1 font-semibold text-gray-900">Comentario:</h4>
+                            <p class="mb-4 text-base font-normal text-gray-500">{{llamada.Comentarios}}
+                            </p>
+                            <div class="flex justify-end space-y-2"> <!-- Alinea el realizada por a la derecha -->
+                                <!-- <p><span class="text-sm text-gray-500 italic">Herramienta de cobro: {{llamada.herramienta_cobro}}</span></p>  -->
+                                <p><span class="text-sm text-gray-500 italic">Realizada por: {{llamada.usuario}}</span>
+                                </p>
+                            </div>
+                        </li>
+
+                        {% else %}
+                        <div class="flex flex-col items-center justify-center text-center py-20 px-6 bg-white">
+                            <div class="text-6xl text-red-600 mb-4">
+                                <i class="fa-solid fa-ban"></i>
+                            </div>
+                            <h1 class="text-3xl font-semibold text-gray-800 mb-4">Sin llamadas registradas</h1>
+                            <p class="text-lg text-gray-600">
+                                Este cliente aún no tiene historial de llamadas disponibles en el sistema.
+                            </p>
+                        </div>
+                        {% endfor %}
+                    </ol>
+                </div>
+
             </div>
         </div>
     </div>
-</div>
 
-<div class="w-full mt-10">
-    <div class="grid max-w-xs grid-cols-3 gap-1 p-1 mx-auto my-2 bg-gray-100 rounded-lg" role="group">
-        <button data-tooltip-target="tooltip-cliente" data-tab="tab1"
-            class="tab-btn px-5 py-1.5 text-xs font-medium text-white bg-blue-900 rounded-lg">
-            <i class="fa fa-user"></i>
-        </button>
-        <div id="tooltip-cliente" role="tooltip"
-            class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip">
-            Información del cliente
-            <div class="tooltip-arrow" data-popper-arrow></div>
+
+    <div data-dial-init class="fixed end-6 bottom-6 group">
+        <div id="speed-dial-menu-default" class="flex-col items-center hidden mb-4 space-y-2">
+
+            <button type="button" data-tooltip-target="tooltip-statement" data-tooltip-placement="left"
+                data-modal-target="estadoCuenta-modal" data-modal-toggle="estadoCuenta-modal"
+                class="flex justify-center items-center w-[52px] h-[52px] text-blue-800 hover:text-blue-900 bg-white rounded-full border border-gray-200 shadow-xs hover:bg-gray-50 focus:ring-4 focus:ring-blue-500 focus:outline-none">
+                <i class="fa-solid fa-file-invoice-dollar"></i>
+                <span class="sr-only">Estado de cuenta</span>
+            </button>
+            <div id="tooltip-statement" role="tooltip"
+                class="absolute z-10 invisible inline-block w-auto px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-xs opacity-0 tooltip">
+                Estado de cuenta
+                <div class="tooltip-arrow" data-popper-arrow></div>
+            </div>
+
+            <button type="button" data-tooltip-target="tooltip-reportarEstado" data-tooltip-placement="left"
+                data-modal-target="select-modal" data-modal-toggle="select-modal"
+                class="flex justify-center items-center w-[52px] h-[52px] text-blue-800 hover:text-blue-900 bg-white rounded-full border border-gray-200 shadow-xs hover:bg-gray-50 focus:ring-4 focus:ring-blue-500 focus:outline-none">
+                <i class="fa-solid fa-file-invoice"></i>
+                <span class="sr-only">Reportar estado</span>
+            </button>
+            <div id="tooltip-reportarEstado" role="tooltip"
+                class="absolute z-10 invisible inline-block w-auto px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-xs opacity-0 tooltip">
+                Reportar estado
+                <div class="tooltip-arrow" data-popper-arrow></div>
+            </div>
+
+            <button type="button" data-tooltip-target="tooltip-registrarLlamada" data-tooltip-placement="left"
+                data-modal-target="crud-modal" data-modal-toggle="crud-modal"
+                class="flex justify-center items-center w-[52px] h-[52px] text-blue-800 hover:text-blue-900 bg-white rounded-full border border-gray-200 shadow-xs hover:bg-gray-50 focus:ring-4 focus:ring-blue-500 focus:outline-none">
+                <i class="fa-solid fa-phone"></i>
+                <span class="sr-only">Registrar una nueva llamada</span>
+            </button>
+            <div id="tooltip-registrarLlamada" role="tooltip"
+                class="absolute z-10 invisible inline-block w-auto px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-xs opacity-0 tooltip">
+                Nueva llamada
+                <div class="tooltip-arrow" data-popper-arrow></div>
+            </div>
+
+
         </div>
-
-        <button data-tooltip-target="tooltip-llamadas" data-tab="tab2"
-            class="tab-btn px-5 py-1.5 text-xs font-medium text-white bg-blue-900 rounded-lg">
-            <i class="fa fa-phone"></i>
+        <button type="button" data-dial-toggle="speed-dial-menu-default" aria-controls="speed-dial-menu-default"
+            aria-expanded="false"
+            class="flex items-center justify-center text-white bg-blue-800 rounded-full w-14 h-14 hover:bg-blue-900 focus:ring-4 focus:ring-blue-500 focus:outline-none">
+            <svg class="w-5 h-5 transition-transform group-hover:rotate-45" aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 18">
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M9 1v16M1 9h16" />
+            </svg>
+            <span class="sr-only">Open actions menu</span>
         </button>
-        <div id="tooltip-llamadas" role="tooltip"
-            class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip">
-            Registros de llamadas
-            <div class="tooltip-arrow" data-popper-arrow></div>
-        </div>
-
-        <button data-tooltip-target="tooltip-perfil" data-tab="tab3"
-            class="tab-btn px-5 py-1.5 text-xs font-medium text-white bg-blue-900 rounded-lg">
-            <i class="fa fa-person-digging"></i>
-        </button>
-        <div id="tooltip-perfil" role="tooltip"
-            class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip">
-            Funcionalidad en desarrollo
-            <div class="tooltip-arrow" data-popper-arrow></div>
-        </div>
-
     </div>
-</div>
-
-
-<div data-dial-init class="fixed end-6 bottom-6 group">
-    <div id="speed-dial-menu-default" class="flex-col items-center hidden mb-4 space-y-2">
-
-        <button type="button" data-tooltip-target="tooltip-statement" data-tooltip-placement="left"
-            data-modal-target="estadoCuenta-modal" data-modal-toggle="estadoCuenta-modal"
-            class="flex justify-center items-center w-[52px] h-[52px] text-blue-800 hover:text-blue-900 bg-white rounded-full border border-gray-200 shadow-xs hover:bg-gray-50 focus:ring-4 focus:ring-blue-500 focus:outline-none">
-            <i class="fa-solid fa-file-invoice-dollar"></i>
-            <span class="sr-only">Estado de cuenta</span>
-        </button>
-        <div id="tooltip-statement" role="tooltip"
-            class="absolute z-10 invisible inline-block w-auto px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-xs opacity-0 tooltip">
-            Estado de cuenta
-            <div class="tooltip-arrow" data-popper-arrow></div>
-        </div>
-
-        <button type="button" data-tooltip-target="tooltip-reportarEstado" data-tooltip-placement="left"
-            data-modal-target="select-modal" data-modal-toggle="select-modal"
-            class="flex justify-center items-center w-[52px] h-[52px] text-blue-800 hover:text-blue-900 bg-white rounded-full border border-gray-200 shadow-xs hover:bg-gray-50 focus:ring-4 focus:ring-blue-500 focus:outline-none">
-            <i class="fa-solid fa-file-invoice"></i>
-            <span class="sr-only">Reportar estado</span>
-        </button>
-        <div id="tooltip-reportarEstado" role="tooltip"
-            class="absolute z-10 invisible inline-block w-auto px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-xs opacity-0 tooltip">
-            Reportar estado
-            <div class="tooltip-arrow" data-popper-arrow></div>
-        </div>
-
-        <button type="button" data-tooltip-target="tooltip-registrarLlamada" data-tooltip-placement="left"
-            data-modal-target="crud-modal" data-modal-toggle="crud-modal"
-            class="flex justify-center items-center w-[52px] h-[52px] text-blue-800 hover:text-blue-900 bg-white rounded-full border border-gray-200 shadow-xs hover:bg-gray-50 focus:ring-4 focus:ring-blue-500 focus:outline-none">
-            <i class="fa-solid fa-phone"></i>
-            <span class="sr-only">Registrar una nueva llamada</span>
-        </button>
-        <div id="tooltip-registrarLlamada" role="tooltip"
-            class="absolute z-10 invisible inline-block w-auto px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-xs opacity-0 tooltip">
-            Nueva llamada
-            <div class="tooltip-arrow" data-popper-arrow></div>
-        </div>
-
-
-    </div>
-    <button type="button" data-dial-toggle="speed-dial-menu-default" aria-controls="speed-dial-menu-default"
-        aria-expanded="false"
-        class="flex items-center justify-center text-white bg-blue-800 rounded-full w-14 h-14 hover:bg-blue-900 focus:ring-4 focus:ring-blue-500 focus:outline-none">
-        <svg class="w-5 h-5 transition-transform group-hover:rotate-45" aria-hidden="true"
-            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 18">
-            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M9 1v16M1 9h16" />
-        </svg>
-        <span class="sr-only">Open actions menu</span>
-    </button>
-</div>
 
 </div>
 
@@ -313,7 +298,8 @@
                     </div>
 
                     <div class="col-span-2 sm:col-span-1">
-                        <label for="estado_llamada" class="block mb-2 text-sm font-medium text-gray-900">Estado de la
+                        <label for="estado_llamada" class="block mb-2 text-sm font-medium text-gray-900">Estado de
+                            la
                             Llamada</label>
                         <select id="estado_llamada" name="estado_llamada" required
                             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5">
@@ -348,15 +334,18 @@
                             <option selected disabled>Seleccione un motivo</option>
                             <option value="No hay cancelacion">No hay cancelacion</option>
                             <option value="Reducción de Gastos">Reducción de Gastos</option>
-                            <option value="Oferta de Servicios empaquetados">Oferta de Servicios empaquetados</option>
-                            <option value="Traslado del servicio y no hay red física">Traslado del servicio y no hay red
+                            <option value="Oferta de Servicios empaquetados">Oferta de Servicios empaquetados
+                            </option>
+                            <option value="Traslado del servicio y no hay red física">Traslado del servicio y no hay
+                                red
                                 física</option>
                             <option value="Sin Empleo">Sin Empleo</option>
                             <option value="Ya posee otro servicio donde se traslada">Ya posee otro servicio donde se
                                 traslada</option>
                             <option value="Avería reincidente">Avería reincidente</option>
                             <option value="Problemas de Señal">Problemas de Señal</option>
-                            <option value="Cambio de Domicilio al extranjero">Cambio de Domicilio al extranjero</option>
+                            <option value="Cambio de Domicilio al extranjero">Cambio de Domicilio al extranjero
+                            </option>
                             <option value="Usa Celular de Módem">Usa Celular de Módem</option>
                             <option value="Disminución de Ingresos">Disminución de Ingresos</option>
                             <option value="Nadie se Mantiene en Casa">Nadie se Mantiene en Casa</option>
@@ -365,7 +354,8 @@
                     </div>
 
                     <div class="col-span-2 sm:col-span-1">
-                        <label for="tipo_base" class="block mb-2 text-sm font-medium text-gray-900">Tipo de Base</label>
+                        <label for="tipo_base" class="block mb-2 text-sm font-medium text-gray-900">Tipo de
+                            Base</label>
                         <select id="tipo_base" name="tipo_base" required
                             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5">
                             <option selected disabled>Seleccione un tipo</option>
@@ -376,7 +366,8 @@
                     </div>
 
                     <div class="col-span-2 sm:col-span-1">
-                        <label for="proxima_llamada" class="block mb-2 text-sm font-medium text-gray-900">Fecha de la
+                        <label for="proxima_llamada" class="block mb-2 text-sm font-medium text-gray-900">Fecha de
+                            la
                             Próxima Llamada</label>
                         <div class="relative max-w-sm">
                             <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">

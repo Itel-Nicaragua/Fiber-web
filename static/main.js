@@ -109,9 +109,25 @@ document.addEventListener("DOMContentLoaded", function () {
       );
       button.classList.add("bg-blue-900", "text-white");
     });
+    document.getElementById('tabs-wrapper').scrollTo({ top: 0, behavior: 'auto' });
   });
 });
 
+const btns = document.querySelectorAll('.tab-btn');
+const tabs = document.querySelectorAll('.tab-content');
+
+btns.forEach(btn => {
+  btn.addEventListener('click',()=>{
+    const showId = btn.getAttribute('data-tab');
+    tabs.forEach(tab=>{
+      tab.id === showId
+        ? tab.classList.replace('hidden','block')
+        : tab.classList.replace('block','hidden');
+    });
+  });
+});
+
+// Opciones de estado
 
 document.addEventListener('DOMContentLoaded', function () {
   const nextBtn = document.querySelector('[data-modal-target="second-modal"]');

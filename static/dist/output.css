@@ -1527,14 +1527,23 @@
   .h-\[calc\(100\%-1rem\)\] {
     height: calc(100% - 1rem);
   }
+  .h-\[calc\(100vh-200px\)\] {
+    height: calc(100vh - 200px);
+  }
   .h-full {
     height: 100%;
   }
   .h-screen {
     height: 100vh;
   }
+  .max-h-\[calc\(100vh-4rem\)\] {
+    max-height: calc(100vh - 4rem);
+  }
   .max-h-full {
     max-height: 100%;
+  }
+  .min-h-\[var\(--tab1-h\)\] {
+    min-height: var(--tab1-h);
   }
   .min-h-full {
     min-height: 100%;

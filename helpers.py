@@ -60,7 +60,7 @@ def exportar_historial(fecha_inicio, fecha_final):
     conn = get_sqlserver_connection1()
     query = """
         SELECT * FROM historial_llamadas
-        WHERE fecha_llamada BETWEEN ? AND ? ORDER BY fecha_llamada
+        where convert(date, fecha_registro) BETWEEN ? AND ? ORDER BY fecha_registro
     """
     df = pd.read_sql(query, conn, params=[fecha_inicio, fecha_final])
     conn.close()
@@ -80,7 +80,7 @@ def exportar_base_total(fecha_inicio, fecha_final):
     conn = get_sqlserver_connection1()
     query = """
         SELECT * FROM actual
-        WHERE fecha_suscripcion BETWEEN ? AND ? ORDER BY fecha_suscripcion
+        WHERE convert(date, fecha_suscripcion) BETWEEN ? AND ? ORDER BY fecha_suscripcion
     """
     df = pd.read_sql(query, conn, params=[fecha_inicio, fecha_final])
     conn.close()

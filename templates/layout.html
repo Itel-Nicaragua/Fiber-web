@@ -18,6 +18,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 
   <link rel="shortcut icon" href="/static/imagenes/favicon.png" />
+
 </head>
 
 <body class="bg-gray-100 font-poppins">
@@ -68,22 +69,33 @@
     {% endif %}
     <!-- Main content -->
     <main class="flex-1 p-4 overflow-auto">
-     
+
       <!-- Flash Messages -->
       <div class="w-full">
-       
-        <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-        {% if get_flashed_messages() %} {% with messages =
-        get_flashed_messages(with_categories=true) %} {% for category, m in
-        messages %} {% if category == "exito" %}
+
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+        {% if get_flashed_messages() %} {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, m in messages %}
+        {% if category == "exito" %}
         <script>
-          swal({ title: "Éxito", text: "{{m}}", icon: "success" });
+          Swal.fire({
+            title: "Éxito",
+            icon: "success",
+            text: "{{ m }}",
+          });
         </script>
         {% elif category == "error" %}
         <script>
-          swal({ title: "Error", text: "{{m}}", icon: "error" });
+          Swal.fire({
+            title: "Error",
+            icon: "error",
+            text: "{{ m }}",
+          });
         </script>
-        {% endif %} {% endfor %} {% endwith %} {% endif %}
+        {% endif %}
+        {% endfor %}
+        {% endwith %} {% endif %}
       </div>
 
       <!-- Main slot -->
@@ -204,6 +216,9 @@
 
 
 </body>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 
 <!-- Flowbite -->
 <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>

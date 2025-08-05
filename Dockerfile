@@ -13,7 +13,15 @@ RUN apt-get update && apt-get install -y \
     apt-transport-https \
     unzip \
     default-libmysqlclient-dev \
-    && rm -rf /var/lib/apt/lists/*
+    locales && \
+    locale-gen es_ES.UTF-8 && \
+    update-locale LANG=es_ES.UTF-8 && \
+    rm -rf /var/lib/apt/lists/*
+
+# Configurar variables de entorno para el locale en español
+ENV LANG=es_ES.UTF-8
+ENV LANGUAGE=es_ES:es
+ENV LC_ALL=es_ES.UTF-8
 
 # Importar la clave pública de Microsoft y agregar el repositorio de forma segura
 RUN curl -sSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor -o /usr/share/keyrings/microsoft.gpg && \
@@ -29,7 +37,6 @@ COPY instantclient_19_28 /usr/lib/oracle/instantclient/instantclient_19_28
 # Configurar variables de entorno para Oracle Instant Client
 ENV LD_LIBRARY_PATH=/usr/lib/oracle/instantclient/instantclient_19_28:$LD_LIBRARY_PATH
 ENV ORACLE_HOME=/usr/lib/oracle/instantclient/instantclient_19_28
-
 
 # Instalar dependencias de Python
 COPY requirements.txt ./

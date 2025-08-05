@@ -341,6 +341,8 @@ def insertar_llamada():
     motivo_macro = request.form.get('motivo_macro')
     motivo_micro = request.form.get('motivo_micro')
     proxima_llamada = request.form.get('proxima_llamada')
+    proxima_llamada = proxima_llamada or None
+    print(proxima_llamada)
     estado_llamada = request.form.get('estado_llamada')
     comentario = request.form.get('comentarios')
     usuario = session['user_name']

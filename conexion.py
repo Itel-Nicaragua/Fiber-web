@@ -72,7 +72,6 @@ def get_mysql_connection():
         cursorclass=pymysql.cursors.DictCursor,
         connect_timeout=5
     )
-    print("Tiempo conexión MySQL:", time.time() - start)
     return conn
 
 def get_oracle_connection():

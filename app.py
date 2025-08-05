@@ -293,7 +293,6 @@ def info_cliente(numero):
     """)
 
     post_venta = cursor.fetchall()
-    print("Tiempo consulta postventa:", time.time() - start)
 
     cursor.close()
     conn.close()
@@ -342,7 +341,6 @@ def insertar_llamada():
     motivo_micro = request.form.get('motivo_micro')
     proxima_llamada = request.form.get('proxima_llamada')
     proxima_llamada = proxima_llamada or None
-    print(proxima_llamada)
     estado_llamada = request.form.get('estado_llamada')
     comentario = request.form.get('comentarios')
     usuario = session['user_name']

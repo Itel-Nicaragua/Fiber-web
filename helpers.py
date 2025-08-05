@@ -86,18 +86,19 @@ def exportar_base_total(fecha_inicio, fecha_final):
     conn.close()
     return df
 
+
 def formatear_fecha(fecha):
+    # Establecer variables de entorno directamente
+    os.environ["LC_ALL"] = "es_ES.UTF-8"
+    os.environ["LANG"] = "es_ES.UTF-8"
+    
     try:
-        # Configurar el locale en español (puede variar según el sistema)
         locale.setlocale(locale.LC_TIME, 'es_ES.UTF-8')
-    except locale.Error:
-        try:
-            # Alternativa para algunos sistemas
-            locale.setlocale(locale.LC_TIME, 'es_ES')
-        except:
-            print("No se pudo configurar el locale en español, se usarán nombres en inglés.")
-    
-    # Formatear la fecha al formato deseado
-    fecha_formateada = fecha.strftime("%d de %B %Y, %H:%M")
-    
-    return fecha_formateada
+    except locale.Error as e:
+        print("⚠️ Error configurando el locale:", e)
+        return fecha.strftime("%d de %B %Y, %H:%M (sin traducción)")
+
+    return fecha.strftime("%d de %B %Y, %H:%M")
+
+# Prueba
+print(formatear_fecha(datetime.now()))

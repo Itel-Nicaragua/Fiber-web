@@ -15,6 +15,12 @@ RUN apt-get update && apt-get install -y \
     default-libmysqlclient-dev \
     && rm -rf /var/lib/apt/lists/*
 
+# Configurar locales español
+RUN echo "es_ES.UTF-8 UTF-8" > /etc/locale.gen && locale-gen es_ES.UTF-8 && update-locale LANG=es_ES.UTF-8
+ENV LANG=es_ES.UTF-8
+ENV LANGUAGE=es_ES:es
+ENV LC_ALL=es_ES.UTF-8
+
 # Importar la clave pública de Microsoft y agregar el repositorio de forma segura
 RUN curl -sSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor -o /usr/share/keyrings/microsoft.gpg && \
     echo "deb [arch=amd64 signed-by=/usr/share/keyrings/microsoft.gpg] https://packages.microsoft.com/debian/12/prod bookworm main" > /etc/apt/sources.list.d/mssql-release.list
@@ -42,4 +48,4 @@ COPY . .
 EXPOSE 5000
 
 # Usar gunicorn para producción
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "app:app"]
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "app:app", "--timeout", "120"]

@@ -3,10 +3,11 @@ import os
 from flask import redirect, request, session
 from functools import wraps
 from flask.helpers import flash
-from conexion import get_sqlserver_connection1
+from conexion import get_sqlserver_engine1
 import pandas as pd
 from datetime import datetime
 import locale
+from sqlalchemy import text
 
 
 
@@ -57,33 +58,39 @@ def validarDouble(dato):
     return True
 
 def exportar_historial(fecha_inicio, fecha_final):
-    conn = get_sqlserver_connection1()
-    query = """
+    engine = get_sqlserver_engine1()
+    query = text("""
         SELECT * FROM historial_llamadas
-        where convert(date, fecha_registro) BETWEEN ? AND ? ORDER BY fecha_registro
-    """
-    df = pd.read_sql(query, conn, params=[fecha_inicio, fecha_final])
-    conn.close()
+        WHERE convert(date, fecha_registro) BETWEEN :fecha_inicio AND :fecha_final ORDER BY fecha_registro
+    """)
+    with engine.connect() as conn:
+        result = conn.execute(query, {"fecha_inicio": fecha_inicio, "fecha_final": fecha_final})
+        rows = result.fetchall()
+        df = pd.DataFrame(rows, columns=result.keys())
     return df
 
 def exportar_historial_telemarketing(fecha_inicio, fecha_final):
-    conn = get_sqlserver_connection1()
-    query = """
+    engine = get_sqlserver_engine1()
+    query = text("""
         SELECT * FROM telemarketing
-        WHERE fecha BETWEEN ? AND ? ORDER BY fecha
-    """
-    df = pd.read_sql(query, conn, params=[fecha_inicio, fecha_final])
-    conn.close()
+        WHERE fecha BETWEEN :fecha_inicio AND :fecha_final ORDER BY fecha
+    """)
+    with engine.connect() as conn:
+        result = conn.execute(query, {"fecha_inicio": fecha_inicio, "fecha_final": fecha_final})
+        rows = result.fetchall()
+        df = pd.DataFrame(rows, columns=result.keys())
     return df
 
 def exportar_base_total(fecha_inicio, fecha_final):
-    conn = get_sqlserver_connection1()
-    query = """
+    engine = get_sqlserver_engine1()
+    query = text("""
         SELECT * FROM actual
-        WHERE convert(date, fecha_suscripcion) BETWEEN ? AND ? ORDER BY fecha_suscripcion
-    """
-    df = pd.read_sql(query, conn, params=[fecha_inicio, fecha_final])
-    conn.close()
+        WHERE convert(date, fecha_suscripcion) BETWEEN :fecha_inicio AND :fecha_final ORDER BY fecha_suscripcion
+    """)
+    with engine.connect() as conn:
+        result = conn.execute(query, {"fecha_inicio": fecha_inicio, "fecha_final": fecha_final})
+        rows = result.fetchall()
+        df = pd.DataFrame(rows, columns=result.keys())
     return df
 
 

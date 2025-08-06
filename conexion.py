@@ -3,7 +3,19 @@ import pymysql
 import pyodbc
 import cx_Oracle
 import time
+from sqlalchemy import create_engine
+import urllib
 
+def get_sqlserver_engine1():
+    params = urllib.parse.quote_plus(
+        f"DRIVER={SQL_SERVER_1_CONFIG['driver']};"
+        f"SERVER={SQL_SERVER_1_CONFIG['server']};"
+        f"DATABASE={SQL_SERVER_1_CONFIG['database']};"
+        f"UID={SQL_SERVER_1_CONFIG['uid']};"
+        f"PWD={SQL_SERVER_1_CONFIG['pwd']}"
+    )
+    engine = create_engine(f"mssql+pyodbc:///?odbc_connect={params}")
+    return engine
 
 # SQL Server 1
 SQL_SERVER_1_CONFIG = {

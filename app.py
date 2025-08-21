@@ -401,42 +401,49 @@ def get_estado_cuenta(numero):
     cursor = conn.cursor()
 
     consulta = """
-    WITH DatosRecarga AS (
-        SELECT 
-            MONTH(rechargedate)        AS mes_num,
-            FORMAT(rechargedate,'MMMM','es-es') AS mes_nombre,
-            YEAR(rechargedate)         AS anio,
-            phoneno,
-            SUM(amount)                AS monto_total,
-            COUNT(*)                   AS conteo_recargas,
-            ROW_NUMBER() OVER(
-              ORDER BY YEAR(rechargedate), MONTH(rechargedate)
-            )                          AS cuota
-        FROM cootelcuboparque.cootelcuboparque.cr_history
-        WHERE PhoneNo = ?
-        GROUP BY 
-          MONTH(rechargedate),
-          YEAR(rechargedate),
-          FORMAT(rechargedate,'MMMM','es-es'),
-          phoneno
-    )
-    SELECT
-        d.cuota      AS cuota,
-        LEFT(d.mes_nombre,3) + ' ' + CAST(d.anio AS VARCHAR) AS mes,
-        ROUND(d.monto_total,2) AS monto,
-        ROUND(
-          ((0.36*a.distancia)+60.30)/a.vigencia *
-           CASE WHEN d.monto_total > a.precio 
-                THEN d.monto_total/a.precio 
-                ELSE 1 END
-        ,2)                   AS equipos,
-        ROUND(
-          d.monto_total - 
-          ((0.36*a.distancia)+60.30)/a.vigencia *
-           CASE WHEN d.monto_total > a.precio 
-                THEN d.monto_total/a.precio 
-                ELSE 1 END
-        ,2)                   AS servicio
+WITH DatosRecarga AS (
+    SELECT 
+        MONTH(rechargedate)        AS mes_num,
+        FORMAT(rechargedate,'MMMM','es-es') AS mes_nombre,
+        YEAR(rechargedate)         AS anio,
+        phoneno,
+        SUM(TRY_CAST(amount AS DECIMAL(18,2))) AS monto_total,
+        COUNT(*)                   AS conteo_recargas,
+        ROW_NUMBER() OVER(
+          ORDER BY YEAR(rechargedate), MONTH(rechargedate)
+        )                          AS cuota
+    FROM cootelcuboparque.cootelcuboparque.cr_history
+    WHERE PhoneNo = ?
+    GROUP BY 
+      MONTH(rechargedate),
+      YEAR(rechargedate),
+      FORMAT(rechargedate,'MMMM','es-es'),
+      phoneno
+)
+SELECT
+    d.cuota      AS cuota,
+    LEFT(d.mes_nombre,3) + ' ' + CAST(d.anio AS VARCHAR) AS mes,
+    ROUND(d.monto_total,2) AS monto,
+    ROUND(
+        ((0.36*TRY_CAST(a.distancia AS DECIMAL(18,2)))+60.30) 
+        / NULLIF(TRY_CAST(a.vigencia AS DECIMAL(18,2)),0) *
+        CASE 
+            WHEN d.monto_total > TRY_CAST(a.precio AS DECIMAL(18,2)) 
+                THEN d.monto_total / NULLIF(TRY_CAST(a.precio AS DECIMAL(18,2)),0) 
+            ELSE 1 
+        END
+    ,2) AS equipos,
+    ROUND(
+        d.monto_total - 
+        (((0.36*TRY_CAST(a.distancia AS DECIMAL(18,2)))+60.30) 
+         / NULLIF(TRY_CAST(a.vigencia AS DECIMAL(18,2)),0) *
+         CASE 
+            WHEN d.monto_total > TRY_CAST(a.precio AS DECIMAL(18,2)) 
+                THEN d.monto_total / NULLIF(TRY_CAST(a.precio AS DECIMAL(18,2)),0) 
+            ELSE 1 
+         END
+        )
+    ,2) AS servicio
     FROM actual a
     JOIN DatosRecarga d ON a.numero = d.phoneno
     ORDER BY d.cuota;

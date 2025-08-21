@@ -374,7 +374,7 @@ def insertar_llamada():
             fecha_renovacion, subsidio, Accion, estado_final,
             ?, ?, ?, ?, GETDATE(), ?, ?, ?, ?, ?
         FROM actual
-        WHERE numero = ?
+        WHERE numero = ? LIMIT 1
     """, (
         proxima_llamada,
         estado_llamada,

@@ -51,14 +51,14 @@ def login():
         try:
             conn = get_sqlserver_connection1()
             cursor = conn.cursor()
-            cursor.execute(f"SELECT id, username, pass, active, rol FROM users_new WHERE username = ?", username)
+            cursor.execute(f"SELECT id, username, pass, active, rol, id_admin_ticket FROM users_new WHERE username = ?", username)
             row = cursor.fetchone()
 
             if not row:
                 flash("Nombre o contraseña incorrectos", "error")
                 return render_template("login.html")
 
-            id, user_name, hashed_pass, is_active, rol = row
+            id, user_name, hashed_pass, is_active, rol, id_admin_ticket = row
 
             cursor.execute("INSERT INTO ingresos_users (name_user, fecha_ingreso) VALUES (?, GETDATE())", user_name)
             conn.commit()
@@ -66,13 +66,19 @@ def login():
             cursor.close()
             conn.close()
 
+            
+            if is_active != 1:
+                flash("Usuario inactivo, contacte a un administrador", "error")
+                return render_template("login.html")
+
             if not check_password_hash(hashed_pass, password):
                 flash("Nombre o contraseña incorrectos", "error")
                 return render_template("login.html")
-
+            
             session["user_id"] = id
             session["user_name"] = user_name
             session["rol"] = rol
+            session["id_admin_ticket"] = id_admin_ticket
 
             return redirect("/")
 
@@ -274,6 +280,7 @@ def info_cliente(numero):
 
     motivos_estado = [
         "Baja Administrativa Sin Penalización",
+        "Baja Fin de Contrato",
         "Baja Voluntaria",
         "Cobranza Activa",
         "Falta de información PBDC",
@@ -324,8 +331,45 @@ def reportar_estado():
     cursor.execute(f"UPDATE actual SET estado_final = ? WHERE numero = {numero}", estado)
     conn.commit()
 
-    cursor.close()
-    conn.close()
+    motivos_estado = [
+        {"id": 18, "estado": "Baja Voluntaria"},
+        {"id": 19, "estado": "Baja Administrativa Sin Penalización"},
+        {"id": 21, "estado": "Baja Fin de Contrato"},
+        {"id": 23, "estado": "Reporte al Buro"},
+    ]
+
+    estado_a_id = {m["estado"]: m["id"] for m in motivos_estado}
+
+    if estado in estado_a_id:
+        conn = get_mysql_connection()
+        cursor = conn.cursor()
+
+        cursor.execute(f"SELECT id_customer FROM Customers WHERE service_number = {numero}")
+        row = cursor.fetchone()
+
+        if row:
+
+            id_customer = row['id_customer']
+            id_estado = estado_a_id[estado]
+            id_user = session['id_admin_ticket']
+
+            query = """
+            INSERT INTO Customers_proccess
+            (id_customer, id_status, id_user, date_approval, comments_approval, is_approval)
+            VALUES (%s, %s, %s, NOW(), %s, 1)
+            """
+
+            values = (id_customer, id_estado, id_user, comentario)
+
+            cursor.execute(query, values)
+
+            cursor.execute(f"UPDATE Customers SET id_status = %s WHERE id_customer = {id_customer}", id_estado)
+
+            conn.commit()
+
+        else:
+            flash("Linea no encontrada en sistema de tickets", "error")
+            return redirect(request.url)  
 
     flash("Estado reportado satisfactoriamente", "exito")
     return redirect(f"/info_cliente/{numero}")
@@ -364,7 +408,7 @@ def insertar_llamada():
             estado_llamada, Comentarios, usuario, fecha_registro, area,
             gestion_cobro, herramienta_cobro, motivo_macro, motivo_micro
         )
-        SELECT
+        SELECT TOP 1
             numero, numero_referido, canal_ventas, nombre_canal_ventas, FUR,
             suma_recargas, recarga_ajuste, NoReclamos, fecha_suscripcion,
             information_confirmation, Mes, AnchoBanda, precio, paquete, direccion,
@@ -374,7 +418,7 @@ def insertar_llamada():
             fecha_renovacion, subsidio, Accion, estado_final,
             ?, ?, ?, ?, GETDATE(), ?, ?, ?, ?, ?
         FROM actual
-        WHERE numero = ? LIMIT 1
+        WHERE numero = ? 
     """, (
         proxima_llamada,
         estado_llamada,
@@ -461,9 +505,7 @@ SELECT
 
     total_deuda = (total_servicio + total_equipos) - total_pagado
 
-
-    # Contexto para Jinja
-    contexto = {           # o dinámico
+    contexto = {          
         "fecha":         datetime.now().strftime("%m/%d/%Y %I:%M %p"),
         "total_pagado":  f"{total_pagado:.2f}",
         "total_deuda":   f"{total_deuda:.2f}",

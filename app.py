@@ -395,7 +395,7 @@ def insertar_llamada():
 
     if proxima_llamada:
         fecha = datetime.strptime(proxima_llamada, "%Y-%m-%d")
-        proxima_llamada = fecha  # datetime listo para SQL Server
+        proxima_llamada = fecha
 
     estado_llamada = request.form.get('estado_llamada')
     comentario = request.form.get('comentarios')

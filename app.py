@@ -385,6 +385,12 @@ def insertar_llamada():
     motivo_micro = request.form.get('motivo_micro')
     proxima_llamada = request.form.get('proxima_llamada')
     proxima_llamada = proxima_llamada or None
+
+    if proxima_llamada:
+    # viene como "2025-08-26" (HTML input type="date")
+        fecha = datetime.strptime(proxima_llamada, "%d/%m/%Y")
+        proxima_llamada = fecha.strftime("%Y-%m-%d") 
+
     estado_llamada = request.form.get('estado_llamada')
     comentario = request.form.get('comentarios')
     usuario = session['user_name']

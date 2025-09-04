@@ -374,6 +374,13 @@ def reportar_estado():
     flash("Estado reportado satisfactoriamente", "exito")
     return redirect(f"/info_cliente/{numero}")
 
+def parse_fecha(fecha_str):
+    for fmt in ("%d/%m/%Y", "%m/%d/%Y"):
+        try:
+            return datetime.strptime(fecha_str, fmt)
+        except ValueError:
+            continue
+    raise ValueError(f"Formato de fecha inválido: {fecha_str}")
 
 @app.route('/insertar_llamada', methods=['POST'])
 @login_required
@@ -387,10 +394,11 @@ def insertar_llamada():
     proxima_llamada = proxima_llamada or None
 
     if proxima_llamada:
-        # Formato MM/DD/YYYY
-        fecha = datetime.strptime(proxima_llamada, "%m/%d/%Y")
-        # Convertir a ISO YYYY-MM-DD para SQL Server
-        proxima_llamada = fecha.strftime("%Y-%m-%d")
+        # Parsear fecha en formato ISO
+        fecha = datetime.strptime(proxima_llamada, "%Y-%m-%d")
+        proxima_llamada = fecha  # Mantener como datetime para SQL Server
+
+
 
     estado_llamada = request.form.get('estado_llamada')
     comentario = request.form.get('comentarios')

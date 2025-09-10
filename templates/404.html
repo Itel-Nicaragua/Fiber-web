@@ -1,0 +1,69 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Itel - Fiber
+{% endblock %}
+
+{% block main %}
+<div class="relative w-screen h-screen flex flex-col items-center justify-center overflow-hidden bg-white">
+  
+  <!-- Estrellas fugaces -->
+  <div id="shooting-stars" class="absolute inset-0 overflow-hidden"></div>
+
+  <!-- Contenido principal -->
+  <div class="text-center z-10">
+    <h1 class="text-9xl font-extrabold text-red-600 tracking-widest animate-bounce">404</h1>
+    <p class="text-2xl font-semibold mt-4 text-gray-700">Oops! Página no encontrada.</p>
+    <p class="mt-2 text-gray-500">Lo sentimos, la página que buscas no existe o fue movida.</p>
+    <a href="/" class="mt-6 inline-block px-6 py-3 bg-blue-800 text-white font-medium rounded-lg shadow hover:bg-blue-900 transition transform hover:-translate-y-1 hover:scale-105">
+      Volver al inicio
+    </a>
+  </div>
+</div>
+
+<!-- Script de estrellas fugaces -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const container = document.getElementById('shooting-stars');
+
+  function createStar() {
+    const star = document.createElement('div');
+    star.className = 'w-1 h-1 bg-gray-400 rounded-full absolute';
+    const startX = Math.random() * window.innerWidth;
+    const startY = Math.random() * window.innerHeight / 2;
+    star.style.left = startX + 'px';
+    star.style.top = startY + 'px';
+    star.style.opacity = Math.random();
+    container.appendChild(star);
+
+    const duration = 1000 + Math.random() * 2000;
+    const endX = startX + (Math.random() * 200 - 100);
+    const endY = startY + 200 + Math.random() * 100;
+
+    star.animate([
+      { transform: `translate(0, 0)`, opacity: star.style.opacity },
+      { transform: `translate(${endX - startX}px, ${endY - startY}px)`, opacity: 0 }
+    ], {
+      duration: duration,
+      easing: 'ease-out',
+      iterations: 1
+    });
+
+    setTimeout(() => star.remove(), duration);
+  }
+
+  setInterval(createStar, 200);
+});
+</script>
+
+<style>
+/* Asegura que body y html ocupen todo el viewport y no haya scroll */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+}
+</style>
+
+{% endblock %}

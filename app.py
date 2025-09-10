@@ -11,7 +11,7 @@ from helpers import admin_required, login_required, exportar_historial, exportar
 from flask import jsonify, send_file
 import pyodbc
 import tempfile
-from conexion import get_sqlserver_connection1, get_mysql_connection
+from conexion import get_sqlserver_connection1, get_mysql_connection, get_oracle_connection
 from math import ceil
 import math
 import pdfkit
@@ -51,7 +51,7 @@ def login():
         try:
             conn = get_sqlserver_connection1()
             cursor = conn.cursor()
-            cursor.execute(f"SELECT id, username, pass, active, rol, id_admin_ticket FROM users_new WHERE username = ?", username)
+            cursor.execute(f"SELECT id, username, pass, active, rol, id_admin_ticket FROM users WHERE username = ?", username)
             row = cursor.fetchone()
 
             if not row:
@@ -160,6 +160,9 @@ def index():
         if filtro_dias:
             query_params['filtro_fecha'] = filtro_dias
 
+        if not page:
+            page = 1
+
         return render_template(
             "index.html",
             now=now,
@@ -184,7 +187,7 @@ def index():
 # Mapa de códigos a nombres legibles
 TIPOS_EXPORT = {
     "BT": "base_total",
-    "BL": "historial_llamadas",
+    "BL": "llamadas",
     "BTM": "historial_telemarketing"
 }
 
@@ -245,11 +248,23 @@ def logout():
     session.clear()
     return redirect("/login")
 
+@app.route("/404")
+def errorPage():
+    return render_template("404.html")
 
+@app.route("/dashboard")
+@login_required
+def dashboard():
+    return render_template("dashboard.html")
 
 @app.route("/info_cliente/<numero>/", methods=["GET", "POST"])
 @login_required
 def info_cliente(numero):
+
+    # Validar que sea un número
+    if not numero.isdigit():
+        return redirect('/404')  # redirige a 404 si no es número
+    
     conn = get_sqlserver_connection1()
     cursor = conn.cursor()
 
@@ -258,14 +273,16 @@ def info_cliente(numero):
     columnas_actual = [col[0] for col in cursor.description]
     fila_actual = cursor.fetchone()
 
-    # Reemplazar None por "" en los datos de 'actual'
+    if not fila_actual:
+        return redirect('/404')  # redirige si no se encuentra el registro
+
     if fila_actual:
         datos = {col: (val if val is not None else "") for col, val in zip(columnas_actual, fila_actual)}
     else:
         datos = {}
 
-    # Obtener columnas de la tabla 'historial_llamadas'
-    cursor.execute(f"SELECT * FROM historial_llamadas WHERE numero = {numero} ORDER BY fecha_registro DESC")
+    # Obtener columnas de la tabla 'llamadas'
+    cursor.execute(f"SELECT l.*, u.name FROM llamadas l INNER JOIN users u ON usuario_id = u.id WHERE id_cliente = {fila_actual.id} ORDER BY fecha_registro DESC")
     columnas_llamadas = [col[0] for col in cursor.description]
     filas_llamadas = cursor.fetchall()
 
@@ -385,7 +402,7 @@ def parse_fecha(fecha_str):
 @app.route('/insertar_llamada', methods=['POST'])
 @login_required
 def insertar_llamada():
-    numero  = request.args.get('numero')
+    id_cliente  = request.args.get('id')
     gestion_cobro = request.form.get('gestion_cobro')
     herramienta_cobro = request.form.get('herramienta_cobro')
     motivo_macro = request.form.get('motivo_macro')
@@ -399,7 +416,7 @@ def insertar_llamada():
 
     estado_llamada = request.form.get('estado_llamada')
     comentario = request.form.get('comentarios')
-    usuario = session['user_name']
+    usuario = session['user_id']
     rol = session['rol']
 
     # Área según rol
@@ -409,39 +426,22 @@ def insertar_llamada():
     conn = get_sqlserver_connection1()
     cursor = conn.cursor()
     cursor.execute("""
-        INSERT INTO historial_llamadas (
-            numero, numero_referido, canal_ventas, nombre_canal_ventas, FUR,
-            suma_recargas, recarga_ajuste, NoReclamos, fecha_suscripcion,
-            information_confirmation, Mes, AnchoBanda, precio, paquete, direccion,
-            ciclo, Codigo_OA, departamento, antiguedad_meses, estatus_contrato,
-            recarga_mes_anterior, recarga_mes_actual, deuda_icrm, estatus_orion,
-            Proximo_Pago, ContactphoneNo, Realname, vigencia, distancia,
-            fecha_renovacion, subsidio, Accion, estado_final, fecha_llamada,
-            estado_llamada, Comentarios, usuario, fecha_registro, area,
-            gestion_cobro, herramienta_cobro, motivo_macro, motivo_micro
-        )
-        SELECT TOP 1
-            numero, numero_referido, canal_ventas, nombre_canal_ventas, FUR,
-            suma_recargas, recarga_ajuste, NoReclamos, fecha_suscripcion,
-            information_confirmation, Mes, AnchoBanda, precio, paquete, direccion,
-            ciclo, Codigo_OA, departamento, antiguedad_meses, estatus_contrato,
-            recarga_mes_anterior, recarga_mes_actual, deuda_icrm, estatus_orion,
-            Proximo_Pago, ContactphoneNo, Realname, vigencia, distancia,
-            fecha_renovacion, subsidio, Accion, estado_final,
-            ?, ?, ?, ?, GETDATE(), ?, ?, ?, ?, ?
-        FROM actual
-        WHERE numero = ? 
+        INSERT INTO llamadas (
+                proxima_llamada, estado_llamada, comentarios,
+                usuario_id, fecha_registro, gestion_cobro,
+                herramienta_cobro, motivo_macro, motivo_micro, id_cliente
+        ) VALUES (?, ?, ?, ?, GETDATE(), ?, ?, ?, ?, ?)
+
     """, (
         proxima_llamada,
         estado_llamada,
         comentario,
         usuario,
-        area,
         gestion_cobro,
         herramienta_cobro,
         motivo_macro,
         motivo_micro,
-        numero
+        id_cliente
     ))
 
     conn.commit()
@@ -449,89 +449,104 @@ def insertar_llamada():
     cursor.close()
     conn.close()
     flash("Llamada registrada correctamente", "exito")
-    return redirect(f"/info_cliente/{numero}")
-
+    return redirect(request.referrer)
 
 def get_estado_cuenta(numero):
-    conn = get_sqlserver_connection1()
+    conn = get_oracle_connection()
     cursor = conn.cursor()
 
     consulta = """
-WITH DatosRecarga AS (
-    SELECT 
-        MONTH(rechargedate)        AS mes_num,
-        FORMAT(rechargedate,'MMMM','es-es') AS mes_nombre,
-        YEAR(rechargedate)         AS anio,
-        phoneno,
-        SUM(TRY_CAST(amount AS DECIMAL(18,2))) AS monto_total,
-        COUNT(*)                   AS conteo_recargas,
-        ROW_NUMBER() OVER(
-          ORDER BY YEAR(rechargedate), MONTH(rechargedate)
-        )                          AS cuota
-    FROM cootelcuboparque.cootelcuboparque.cr_history
-    WHERE PhoneNo = ?
-    GROUP BY 
-      MONTH(rechargedate),
-      YEAR(rechargedate),
-      FORMAT(rechargedate,'MMMM','es-es'),
-      phoneno
-)
-SELECT
-    d.cuota      AS cuota,
-    LEFT(d.mes_nombre,3) + ' ' + CAST(d.anio AS VARCHAR) AS mes,
-    ROUND(d.monto_total,2) AS monto,
-    ROUND(
-        ((0.36*TRY_CAST(a.distancia AS DECIMAL(18,2)))+60.30) 
-        / NULLIF(TRY_CAST(a.vigencia AS DECIMAL(18,2)),0) *
-        CASE 
-            WHEN d.monto_total > TRY_CAST(a.precio AS DECIMAL(18,2)) 
-                THEN d.monto_total / NULLIF(TRY_CAST(a.precio AS DECIMAL(18,2)),0) 
-            ELSE 1 
-        END
-    ,2) AS equipos,
-    ROUND(
-        d.monto_total - 
-        (((0.36*TRY_CAST(a.distancia AS DECIMAL(18,2)))+60.30) 
-         / NULLIF(TRY_CAST(a.vigencia AS DECIMAL(18,2)),0) *
-         CASE 
-            WHEN d.monto_total > TRY_CAST(a.precio AS DECIMAL(18,2)) 
-                THEN d.monto_total / NULLIF(TRY_CAST(a.precio AS DECIMAL(18,2)),0) 
-            ELSE 1 
-         END
-        )
-    ,2) AS servicio
-    FROM actual a
-    JOIN DatosRecarga d ON a.numero = d.phoneno
-    ORDER BY d.cuota;
+    SELECT TO_DATE(SUBSTR(LTRIM(TO_CHAR(r.reqtime)), 1, 8), 'YYYYMMDD') as fecha,
+           r.deductamt as monto
+    FROM XBOSS1.xb_transfer_detail r
+    WHERE r.desttelno = :destino
+    ORDER BY fecha DESC
+    """
+    destino = '00505' + numero 
+    cursor.execute(consulta, destino=destino)
+    pagos = cursor.fetchall()
+
+    columnas = [col[0].lower() for col in cursor.description]
+    pagos_dict = [dict(zip(columnas, fila)) for fila in pagos]
+
+    # Formatear fecha como string legible
+    for f in pagos_dict:
+        f['fecha_str'] = f['fecha'].strftime('%d/%m/%Y')
+
+    # Calcular total pagado
+    total_pagado = sum(f['monto'] if f['monto'] is not None else 0 for f in pagos_dict)
+
+    hoy = datetime.today()
+    año_actual, mes_actual = hoy.year, hoy.month
+
+    # Mes pasado
+    if mes_actual == 1:
+        mes_pasado, año_pasado = 12, año_actual - 1
+    else:
+        mes_pasado, año_pasado = mes_actual - 1, año_actual
+
+    # Filtrar y sumar
+    pago_mes_actual = sum(
+        f["monto"] or 0
+        for f in pagos_dict
+        if f["fecha"].year == año_actual and f["fecha"].month == mes_actual
+    )
+
+    pago_mes_pasado = sum(
+        f["monto"] or 0
+        for f in pagos_dict
+        if f["fecha"].year == año_pasado and f["fecha"].month == mes_pasado
+    )
+
+    consulta = """
+    SELECT
+    TO_DATE(SUBSTR(LTRIM(TO_CHAR(ac.ADJUSTTIME)), 1, 8), 'YYYYMMDD') AS fecha,
+    ac.ADJUSTFEENUM AS monto,
+    ac.ADJUSTFEETYPE AS tipo,
+    ac.ADJUSTREASON AS comentario
+    FROM BOSS3_CRM1.ADJUST_ACCOUNT_DETAIL ac
+            INNER JOIN BOSS3.CM_SUBSCRIBER_0 s
+                        ON s.SUBSCRIBER_UID = ac.SUBSCRIBERID
+    AND s.PHONE_NO = :destino
+    ORDER BY fecha DESC
     """
 
-    cursor.execute(consulta, numero)
-    filas = cursor.fetchall()
+    cursor.execute(consulta, destino=destino)
+    ajustes = cursor.fetchall()
 
-    # Cálculos
+    columnas = [col[0].lower() for col in cursor.description]
+    ajustes_dict = [dict(zip(columnas, fila)) for fila in ajustes]
 
-    total_pagado = sum(f.monto if f.monto is not None else 0 for f in filas)
+    # Formatear fecha como string legible
+    for f in ajustes_dict:
+        f['fecha_str'] = f['fecha'].strftime('%d/%m/%Y')
 
-    total_servicio = sum(f.servicio if f.servicio is not None else 0 for f in filas)
-    total_equipos = sum(f.equipos if f.equipos is not None else 0 for f in filas)
+    # Calcular total pagado
+    total_ajustes_positivos = sum(f['monto'] if f['monto'] is not None and f['tipo'] != 3 else 0 for f in ajustes_dict)
+    total_ajustes_negativos = sum(f['monto'] if f['monto'] is not None and f['tipo'] != 2 else 0 for f in ajustes_dict)
+    
+    consulta = """
+    SELECT NVL(SUM(di.rec_amt), 0) AS total_debt
+    FROM xboss1.cm_subs_subscriber ai
+            JOIN xboss1.acct_unwoff di ON ai.subsid = di.subs_id
+    WHERE ai.servnumber = :destino
+    """
 
-    total_deuda = (total_servicio + total_equipos) - total_pagado
-
-    contexto = {          
-        "fecha":         datetime.now().strftime("%m/%d/%Y %I:%M %p"),
-        "total_pagado":  f"{total_pagado:.2f}",
-        "total_deuda":   f"{total_deuda:.2f}",
-        "detalle": [
-            {
-              "cuota":    f.cuota,
-              "mes":      f.mes,
-              "monto":    f"{f.monto:.2f}",
-              "equipos":  f"${f.equipos:.2f}" if f.equipos is not None else "",
-              "servicio": f"${f.servicio:.2f}" if f.servicio is not None else "",
-
-            }
-            for f in filas
-        ]
+    cursor.execute(consulta, destino=destino)
+    deuda = cursor.fetchone()[0]
+    
+    # Devolver todo en un diccionario
+    resultado = {
+        "pagos": pagos_dict,
+        "total_pagado": total_pagado,
+        "ajustes": ajustes_dict,
+        "total_ajustes_positivos": total_ajustes_positivos,
+        "total_ajustes_negativos": total_ajustes_negativos,
+        "deuda": deuda,
+        "mes_actual": pago_mes_actual,
+        "mes_pasado": pago_mes_pasado,
     }
 
-    return contexto
+    return resultado
+
+

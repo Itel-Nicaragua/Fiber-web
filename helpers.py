@@ -60,7 +60,7 @@ def validarDouble(dato):
 def exportar_historial(fecha_inicio, fecha_final):
     engine = get_sqlserver_engine1()
     query = text("""
-        SELECT * FROM historial_llamadas
+        SELECT * FROM vw_llamadas_completa
         WHERE convert(date, fecha_registro) BETWEEN :fecha_inicio AND :fecha_final ORDER BY fecha_registro
     """)
     with engine.connect() as conn:

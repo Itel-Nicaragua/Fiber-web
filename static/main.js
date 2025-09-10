@@ -155,6 +155,13 @@ document.querySelectorAll('input[name="estado"]').forEach((radio) => {
   });
 });
 
+document.addEventListener('DOMContentLoaded', function() {
+  var elems = document.querySelectorAll('.datepicker');
+  M.Datepicker.init(elems, {
+    format: 'dd-mm-yyyy'
+  });
+});
+
 
 document.addEventListener("DOMContentLoaded", function () {
   const form = document.querySelector("#crud-modal form");
